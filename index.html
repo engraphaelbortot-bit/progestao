@@ -29,7 +29,8 @@
         .chart-container-small { position: relative; width: 100%; height: 240px; margin: 0 auto; }
         .chart-container-horizontal { position: relative; width: 100%; height: 180px; } 
 
-        .frente-row { background-color: #f8fafc; border-top: 2px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+        .frente-row { background-color: #f8fafc; border-top: 2px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background-color 0.2s; }
+        .frente-row:hover { background-color: #f1f5f9; }
         .track-bar-container { position: relative; width: 100%; height: 20px; background-color: #e2e8f0; border-radius: 999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
         .track-bar-container.frente { height: 16px; border-radius: 6px; background-color: #cbd5e1; overflow: visible; }
         .track-bar-progress { position: absolute; top: 0; left: 0; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
@@ -136,8 +137,12 @@
                 </div>
                 
                 <div class="flex items-center space-x-3">
-                    <button onclick="exportarExcel()" class="btn-excel bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-md text-sm flex items-center shadow transition-all">📥 Extrair Excel</button>
-                    <div id="cloud-status" class="hidden md:flex items-center text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">☁️ Conectando...</div>
+                    <button onclick="exportarExcel()" class="btn-excel bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-md text-sm flex items-center shadow transition-all">
+                        📥 Extrair Excel
+                    </button>
+                    <div id="cloud-status" class="hidden md:flex items-center text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
+                        ☁️ Conectando...
+                    </div>
                     <div class="hidden md:flex items-center text-sm font-medium text-slate-500 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200 shadow-sm">
                         Hoje: <span class="ml-1 text-slate-800 font-bold" id="current-date-display"></span>
                     </div>
@@ -192,7 +197,7 @@
                             <p class="text-sm text-slate-500 mb-4">Selecione os projetos abaixo para combiná-los na Curva S Geral e analisá-los no Cronograma Macro.</p>
                             <div class="flex flex-wrap gap-2" id="insight-project-filters"></div>
                         </div>
-                        <div class="mb-10"><h3 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">Curva S (Consolidada dos Projetos Selecionados)</h3><div class="chart-container"><canvas id="globalCurvaSChart"></canvas></div></div>
+                        <div class="mb-10"><h3 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">Curva S Dinâmica (Consolidada Ponderada)</h3><div class="chart-container"><canvas id="globalCurvaSChart"></canvas></div></div>
                         <div>
                             <h3 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">Timeline Macro (Projetos Selecionados)</h3>
                             <div class="overflow-x-auto rounded-lg border border-slate-200">
@@ -234,7 +239,7 @@
                         <div class="glass-card p-6 border-t-4 border-slate-400"><p class="text-xs text-slate-500 uppercase font-bold tracking-wider">Total de Tarefas</p><p class="text-4xl font-black text-slate-800 mt-2" id="dash-total">0</p></div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        <div class="glass-card p-6 lg:col-span-2 shadow-sm"><h2 class="text-lg font-bold text-slate-800 mb-6">Curva S Dinâmica (Baseline vs Realizado)</h2><div class="chart-container"><canvas id="curvaSChart"></canvas></div></div>
+                        <div class="glass-card p-6 lg:col-span-2 shadow-sm"><h2 class="text-lg font-bold text-slate-800 mb-6">Curva S Dinâmica (Baseline vs Histórico)</h2><div class="chart-container"><canvas id="curvaSChart"></canvas></div></div>
                         <div class="glass-card p-6 shadow-sm flex flex-col justify-center"><h2 class="text-lg font-bold text-slate-800 mb-4">Distribuição de Status</h2><div class="chart-container-small flex-grow"><canvas id="statusDonutChart"></canvas></div></div>
                     </div>
                     <div class="glass-card overflow-hidden shadow-sm">
@@ -246,7 +251,7 @@
                 <!-- VISÃO: CRONOGRAMA & TAREFAS -->
                 <section id="view-proj-cronograma" class="hidden animate-fade-in w-full max-w-[100%] mx-auto">
                     <div class="mb-8 flex flex-col md:flex-row justify-between md:items-end">
-                        <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">📅 Cronograma e Frentes</h1><p class="text-slate-500 text-sm mt-1">Gerencie as macroatividades, adicione tarefas e acompanhe o avanço dinâmico.</p></div>
+                        <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">📅 Cronograma e Frentes</h1><p class="text-slate-500 text-sm mt-1">Gerencie as macroatividades, adicione tarefas e acompanhe o avanço dinâmico na Timeline.</p></div>
                         <div class="mt-4 md:mt-0 flex space-x-3">
                             <button onclick="abrirModalFrente()" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold py-2.5 px-5 rounded-lg shadow-sm transition-all text-sm">+ Nova Macroatividade</button>
                             <button onclick="abrirModalTarefa()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-sm transition-all text-sm">+ Nova Tarefa</button>
@@ -281,7 +286,7 @@
 
                 <!-- VISÃO: STATUS REPORT -->
                 <section id="view-proj-relatorio" class="hidden animate-fade-in w-full max-w-4xl mx-auto">
-                    <div class="mb-8"><h1 class="text-3xl font-black text-slate-800 tracking-tight">📋 Relatório de Status</h1><p class="text-slate-500 text-sm mt-1">Registre o parecer executivo, justificativas e próximos passos deste projeto.</p></div>
+                    <div class="mb-8"><h1 class="text-3xl font-black text-slate-800 tracking-tight">📋 Relatório de Status (Anotações)</h1><p class="text-slate-500 text-sm mt-1">Registre o parecer executivo, justificativas e próximos passos deste projeto.</p></div>
                     <div class="glass-card p-8 shadow-sm">
                         <div class="mb-6 flex items-center space-x-4 p-5 rounded-xl border" id="relatorio-farol-container"><div class="text-4xl" id="relatorio-icon">🟢</div><div><h3 class="font-black text-xl" id="relatorio-title">Saudável</h3><p class="text-sm text-slate-600 mt-1" id="relatorio-desc">Projeto operando dentro dos limites normais.</p></div></div>
                         <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Parecer Executivo Livre</label>
@@ -308,6 +313,7 @@
                         </div>
                     </div>
                 </section>
+
             </main>
         </div>
     </div> 
@@ -318,34 +324,12 @@
 
     <!-- Modal Editar Frente -->
     <div id="modal-editar-frente" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in">
-            <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Editar Macroatividade</h2><button onclick="fecharModal('modal-editar-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
-            <div class="p-6">
-                <input type="hidden" id="ef-nome-antigo">
-                <label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Novo Nome da Macroatividade *</label>
-                <input type="text" id="ef-nome-novo" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm">
-            </div>
-            <div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50">
-                <button onclick="fecharModal('modal-editar-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button onclick="salvarEdicaoFrente()" class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">Salvar Edição</button>
-            </div>
-        </div>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Editar Macroatividade</h2><button onclick="fecharModal('modal-editar-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div><div class="p-6"><input type="hidden" id="ef-nome-antigo"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Novo Nome da Macroatividade *</label><input type="text" id="ef-nome-novo" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button onclick="fecharModal('modal-editar-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button onclick="salvarEdicaoFrente()" class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">Salvar Edição</button></div></div>
     </div>
 
     <!-- Modal Editar Membro -->
     <div id="modal-editar-membro" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md border border-slate-200 animate-fade-in">
-            <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Editar Membro da Equipe</h2><button onclick="fecharModal('modal-editar-membro')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
-            <div class="p-6 space-y-4">
-                <input type="hidden" id="em-id">
-                <div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Nome Completo *</label><input type="text" id="em-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div>
-                <div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Papel/Cargo *</label><input type="text" id="em-papel" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div>
-            </div>
-            <div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50">
-                <button onclick="fecharModal('modal-editar-membro')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button onclick="salvarEdicaoMembro()" class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">Salvar Membro</button>
-            </div>
-        </div>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md border border-slate-200 animate-fade-in"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Editar Membro da Equipe</h2><button onclick="fecharModal('modal-editar-membro')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div><div class="p-6 space-y-4"><input type="hidden" id="em-id"><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Nome Completo *</label><input type="text" id="em-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Papel/Cargo *</label><input type="text" id="em-papel" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></div><div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button onclick="fecharModal('modal-editar-membro')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button onclick="salvarEdicaoMembro()" class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">Salvar Membro</button></div></div>
     </div>
 
     <!-- Outros Modais -->
@@ -356,16 +340,13 @@
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl border border-slate-200 animate-fade-in"><div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50"><h2 class="text-xl font-black text-slate-800" id="modal-projeto-titulo">Criar Novo Projeto</h2><button onclick="fecharModal('modal-projeto')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div><div class="p-6"><form id="form-projeto" class="grid grid-cols-2 gap-5"><input type="hidden" id="np-id"><div class="col-span-2"><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Nome do Projeto *</label><input type="text" id="np-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Cliente *</label><select id="np-cliente" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm bg-white"></select></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Setor / Área</label><input type="text" id="np-area" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Tecnologia, Engenharia..."></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Data de Início *</label><input type="date" id="np-inicio" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Fim Previsto *</label><input type="date" id="np-fim" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></form></div><div class="p-6 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button onclick="fecharModal('modal-projeto')" class="px-5 py-2.5 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button onclick="salvarProjeto()" id="btn-salvar-projeto" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">Criar Projeto</button></div></div>
     </div>
     <div id="modal-frente" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Nova Macroatividade</h2><button onclick="fecharModal('modal-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div><div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade (Agrupador) *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div><div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button onclick="fecharModal('modal-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button onclick="salvarMacro()" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg text-sm hover:bg-slate-900 shadow-md transition-colors">Salvar Frente</button></div></div>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Nova Macroatividade</h2><button onclick="fecharModal('modal-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div><div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div><div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button onclick="fecharModal('modal-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button onclick="salvarMacro()" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg text-sm hover:bg-slate-900 shadow-md transition-colors">Salvar Frente</button></div></div>
     </div>
     <div id="modal-tarefa" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl border border-slate-200 animate-fade-in"><div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50"><h2 class="text-xl font-black text-slate-800" id="modal-tarefa-titulo">Nova Tarefa</h2><button onclick="fecharModal('modal-tarefa')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div><div class="p-6"><form id="form-tarefa" class="space-y-5"><input type="hidden" id="nt-id" value=""><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Vincular a uma Frente *</label><select id="nt-frente" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none bg-white shadow-sm"></select></div><div class="grid grid-cols-4 gap-4"><div class="col-span-1"><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">EDT</label><input type="text" id="nt-edt" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="1.1"></div><div class="col-span-3"><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Nome da Tarefa *</label><input type="text" id="nt-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Responsável (Atribuição) *</label><select id="nt-resp" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none bg-white shadow-sm"></select></div><div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4"><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Início *</label><input type="date" id="nt-inicio" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Término *</label><input type="date" id="nt-fim" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></div></form></div><div class="p-6 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button onclick="fecharModal('modal-tarefa')" class="px-5 py-2.5 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button onclick="salvarTarefa()" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">💾 Salvar Tarefa</button></div></div>
     </div>
 
-
-    <!-- ========================================================= -->
-    <!-- MOTOR JAVASCRIPT DO SISTEMA                               -->
-    <!-- ========================================================= -->
+    <!-- JAVASCRIPT PRINCIPAL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -456,8 +437,12 @@
         function classColor(status, type="bg") { const map = {'Concluída': 'concluido', 'Em Andamento': 'andamento', 'Atrasada': 'atrasado', 'Em Risco': 'risco', 'No Prazo': 'concluido'}; return `${type}-${map[status] || 'naoiniciado'}`; }
 
         function analiseProjeto(p) {
-            let conc=0, atr=0, soma=0; p.tarefas.forEach(t => { const s = statusDaTarefa(t.inicio, t.fim, t.progresso); if(s==='Concluída') conc++; if(s==='Atrasada') atr++; soma+=Number(t.progresso); });
-            const avg = p.tarefas.length ? (soma/p.tarefas.length) : 0, pctAtr = p.tarefas.length ? (atr/p.tarefas.length) : 0;
+            let conc=0, atr=0, somaPond=0, somaDur=0; 
+            p.tarefas.forEach(t => { 
+                const s = statusDaTarefa(t.inicio, t.fim, t.progresso); if(s==='Concluída') conc++; if(s==='Atrasada') atr++; 
+                let d = Math.max(difDias(new Date(t.inicio+"T12:00:00"), new Date(t.fim+"T12:00:00")), 1); somaDur+=d; somaPond+=(Number(t.progresso)/100)*d;
+            });
+            const avg = somaDur > 0 ? (somaPond/somaDur)*100 : 0, pctAtr = p.tarefas.length ? (atr/p.tarefas.length) : 0;
             let badge = "No Prazo", color = "emerald"; if(pctAtr > 0.15) { badge = "Atrasado"; color = "rose"; } else if(pctAtr > 0) { badge = "Em Risco"; color = "amber"; }
             return { avanco: Math.round(avg), atr, total: p.tarefas.length, conc, badge, color };
         }
@@ -465,13 +450,14 @@
         window.calcularCurvaS = function(tarefasArr) {
             if (!tarefasArr || tarefasArr.length === 0) return { labels: ['Início'], previsto: [0], realizado: [0] };
             let pIni = new Date(tarefasArr[0].inicio + "T12:00:00"); let pFim = new Date(tarefasArr[0].fim + "T12:00:00");
-            tarefasArr.forEach(t => { let tI = new Date(t.inicio + "T12:00:00"), tF = new Date(t.fim + "T12:00:00"); if(tI < pIni) pIni = tI; if(tF > pFim) pFim = tF; });
+            let somaDur = 0;
+            tarefasArr.forEach(t => { let tI = new Date(t.inicio + "T12:00:00"), tF = new Date(t.fim + "T12:00:00"); if(tI < pIni) pIni = tI; if(tF > pFim) pFim = tF; somaDur += Math.max(difDias(tI, tF), 1); });
             if(isNaN(pIni)) pIni = new Date(); if(isNaN(pFim)) pFim = new Date();
 
             let labels = [], previsto = [], realizado = [];
             let hojeLocal = new Date(window.state.hoje.toISOString().split('T')[0]+"T12:00:00");
             let curr = new Date(pIni.getFullYear(), pIni.getMonth(), 1, 12, 0, 0); let end = new Date(pFim.getFullYear(), pFim.getMonth(), 1, 12, 0, 0);
-            let pesoUnitario = 100 / tarefasArr.length;
+            if (curr.getTime() === end.getTime()) end.setMonth(end.getMonth() + 1);
 
             while (curr <= end || labels.length < 2) {
                 labels.push(curr.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
@@ -479,13 +465,20 @@
 
                 tarefasArr.forEach(t => {
                     let tI = new Date(t.inicio + "T12:00:00"), tF = new Date(t.fim + "T12:00:00"); let duracao = Math.max(difDias(tI, tF), 1);
-                    if (fimMes < tI) sumPrev += 0; else if (fimMes >= tF) sumPrev += pesoUnitario; else sumPrev += (difDias(tI, fimMes) / duracao) * pesoUnitario;
-                    if (fimMes < tI) sumReal += 0; else { let progMax = (t.progresso / 100) * pesoUnitario; if (fimMes >= hojeLocal) sumReal += progMax; else { let proporcao = Math.max(0, Math.min(difDias(tI, fimMes) / Math.max(difDias(tI, hojeLocal), 1), 1)); sumReal += proporcao * progMax; } }
+                    let pesoUn = duracao / somaDur;
+                    if (fimMes >= tF) sumPrev += pesoUn; else if (fimMes > tI) sumPrev += (difDias(tI, fimMes) / duracao) * pesoUn;
+                    
+                    let pReal = t.progresso / 100;
+                    let cReal = hojeLocal < tF ? hojeLocal : tF;
+                    let durReal = Math.max(difDias(tI, cReal), 1);
+                    if (fimMes >= cReal) sumReal += pReal * pesoUn; else if (fimMes > tI) sumReal += ((difDias(tI, fimMes) / durReal) * pReal) * pesoUn;
                 });
-                previsto.push(Math.round(sumPrev));
-                if (curr.getFullYear() > hojeLocal.getFullYear() || (curr.getFullYear() === hojeLocal.getFullYear() && curr.getMonth() > hojeLocal.getMonth())) realizado.push(null); else realizado.push(Math.round(sumReal));
+                if (curr.getFullYear() === end.getFullYear() && curr.getMonth() === end.getMonth()) sumPrev = 1;
+                previsto.push(Math.min(Math.round(sumPrev * 100), 100));
+                if (curr.getFullYear() > hojeLocal.getFullYear() || (curr.getFullYear() === hojeLocal.getFullYear() && curr.getMonth() > hojeLocal.getMonth())) realizado.push(null); else realizado.push(Math.min(Math.round(sumReal * 100), 100));
                 curr.setMonth(curr.getMonth() + 1); if (labels.length > 48) break; 
             }
+            let pM = new Date(pIni.getFullYear(), pIni.getMonth() - 1, 1, 12, 0, 0); labels.unshift(pM.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })); previsto.unshift(0); realizado.unshift(0);
             return { labels, previsto, realizado };
         }
 
@@ -522,6 +515,20 @@
         window.navGlobal = function(viewId) { window.state.viewType='global'; window.state.currentView=viewId; window.state.activeProjectId=null; document.getElementById('project-selector').value='global'; applyView(); renderGlobal(); }
         window.navProject = function(viewId) { if(window.PROJETOS_DB.length === 0) { alert("Nenhum projeto encontrado. Você deve criar um projeto primeiro."); document.getElementById('project-selector').value='global'; return; } if(!window.state.activeProjectId) { window.state.activeProjectId = window.PROJETOS_DB[0].id; document.getElementById('project-selector').value = window.state.activeProjectId; } window.state.viewType='project'; window.state.currentView=viewId; applyView(); renderProject(); }
         window.toggleInsightProject = function(pId) { const idx = window.state.insightsSelectedProjects.indexOf(pId); if (idx > -1) window.state.insightsSelectedProjects.splice(idx, 1); else window.state.insightsSelectedProjects.push(pId); renderGlobal(); }
+
+        // ACORDEON DAS FRENTES (TOOGLE)
+        window.toggleFrente = function(frenteId) {
+            const tasks = document.querySelectorAll(`.task-of-${frenteId}`);
+            const icon = document.getElementById(`icon-${frenteId}`);
+            let isHidden = false;
+            
+            tasks.forEach(task => {
+                if (task.classList.contains('hidden')) { task.classList.remove('hidden'); isHidden = false; } 
+                else { task.classList.add('hidden'); isHidden = true; }
+            });
+
+            if (icon) { icon.style.transform = isHidden ? 'rotate(-90deg)' : 'rotate(0deg)'; }
+        };
 
         function applyView() {
             document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden')); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -565,7 +572,7 @@
                     });
                     
                     const wlBody = Object.values(workload).filter(w=>w.total>0);
-                    if(wlBody.length === 0) { document.getElementById('insight-workload-body').innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">Sem tarefas atribuídas.</td></tr>`; }
+                    if(wlBody.length === 0) { document.getElementById('insight-workload-body').innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">Sem tarefas atribuídas a membros.</td></tr>`; }
                     else { document.getElementById('insight-workload-body').innerHTML = wlBody.map(w=> `<tr><td class="py-3 font-bold text-slate-700">${w.nome}</td><td class="py-3 text-center text-blue-600 font-bold">${w.ativas}</td><td class="py-3 text-center text-rose-600 font-bold">${w.atr}</td><td class="py-3 text-center text-emerald-600 font-bold">${w.conc}</td><td class="py-3 text-center font-black text-slate-800">${w.total}</td></tr>`).join(''); }
 
                     const projsSel = window.state.insightsSelectedProjects.length === 0 ? window.PROJETOS_DB : window.PROJETOS_DB.filter(p => window.state.insightsSelectedProjects.includes(p.id));
@@ -574,10 +581,10 @@
 
                     const dadosSGlobal = window.calcularCurvaS(allTarefasGlobal);
                     if(window.charts.globalCurvaS) window.charts.globalCurvaS.destroy();
-                    window.charts.globalCurvaS = new Chart(document.getElementById('globalCurvaSChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(dadosSGlobal).length > 0 ? dadosSGlobal.labels : [''], datasets: [{ label:'Previsto Acumulado', data:dadosSGlobal.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4 }, { label:'Realizado Acumulado', data:dadosSGlobal.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff' }] }, options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}} } });
+                    window.charts.globalCurvaS = new Chart(document.getElementById('globalCurvaSChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(dadosSGlobal).length > 0 ? dadosSGlobal.labels : [''], datasets: [{ label:'Previsto Acumulado', data:dadosSGlobal.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4 }, { label:'Realizado Histórico', data:dadosSGlobal.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff' }] }, options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}} } });
 
                     const tlBody = document.getElementById('global-timeline-body'); const thGlobTl = document.getElementById('th-global-timeline');
-                    if(projsSel.length === 0) { tlBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Nenhum projeto.</td></tr>`; if(thGlobTl) thGlobTl.innerHTML = '<div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline</div>'; } 
+                    if(projsSel.length === 0) { tlBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Nenhum projeto selecionado.</td></tr>`; if(thGlobTl) thGlobTl.innerHTML = '<div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline</div>'; } 
                     else {
                         if(!gIni) gIni = new Date(); if(!gFim) gFim = new Date(); gIni.setDate(gIni.getDate() - 3); gFim.setDate(gFim.getDate() + 10);
                         const totalGlobDias = Math.max(difDias(gIni, gFim), 1); const hojeLocal = new Date(window.state.hoje.toISOString().split('T')[0]+"T12:00:00");
@@ -616,7 +623,7 @@
 
                 const dadosS = window.calcularCurvaS(p.tarefas);
                 if(window.charts.curvaS) window.charts.curvaS.destroy();
-                window.charts.curvaS = new Chart(document.getElementById('curvaSChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(dadosS).length > 0 ? dadosS.labels : [''], datasets: [ { label:'Previsto Acumulado', data:dadosS.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4 }, { label:'Realizado Acumulado', data:dadosS.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff' } ] }, options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}} } });
+                window.charts.curvaS = new Chart(document.getElementById('curvaSChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(dadosS).length > 0 ? dadosS.labels : [''], datasets: [ { label:'Previsto', data:dadosS.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4 }, { label:'Realizado', data:dadosS.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff' } ] }, options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}} } });
 
                 let counts = {'Concluída':0, 'Em Andamento':0, 'Atrasada':0, 'Não Iniciada':0};
                 p.tarefas.forEach(t => counts[statusDaTarefa(t.inicio, t.fim, t.progresso)]++); if(p.tarefas.length === 0) counts = {'Sem Tarefas': 1};
@@ -637,10 +644,7 @@
                 lista.innerHTML = p.equipe.map(m => `
                     <li class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
                         <div class="flex items-center"><div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-lg mr-4 shadow-sm">${m.nome.charAt(0).toUpperCase()}</div><div><p class="text-sm font-bold text-slate-900">${m.nome}</p><p class="text-xs font-semibold text-slate-500">${m.papel || 'Membro'}</p></div></div>
-                        <div class="flex space-x-3">
-                            <button onclick="abrirEditarMembro(${m.id})" class="text-blue-500 hover:text-blue-700 transition-colors text-lg" title="Editar">✏️</button>
-                            <button onclick="removerMembro(${m.id})" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Remover">🗑️</button>
-                        </div>
+                        <div class="flex space-x-3"><button onclick="abrirEditarMembro(${m.id})" class="text-blue-500 hover:text-blue-700 transition-colors text-lg" title="Editar">✏️</button><button onclick="removerMembro(${m.id})" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Remover">🗑️</button></div>
                     </li>
                 `).join('');
             }
@@ -649,7 +653,7 @@
         function renderCronogramaFrentes(p) {
             const tbody = document.getElementById('cronograma-table-body'); const thAcomp = document.getElementById('th-acompanhamento');
             if(!p.tarefas.length && (!p.frentes || !p.frentes.length)) { 
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-slate-500"><span class="text-2xl block mb-2">📅</span>Nenhuma tarefa ou frente cadastrada.<br>Comece criando uma <b>Nova Macroatividade</b> acima.</td></tr>`; 
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-slate-500"><span class="text-2xl block mb-2">📅</span>Nenhuma tarefa ou frente cadastrada.</td></tr>`; 
                 if(thAcomp) thAcomp.innerHTML = '<div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Acompanhamento Visual (Timeline)</div>'; return; 
             }
 
@@ -671,13 +675,17 @@
                 let dataText = "Sem tarefas", fLeft = 0, fWidth = 0;
                 if(f.dMin && f.dMax) { dataText = `${formatarData(f.dMin.toISOString().split('T')[0])} até ${formatarData(f.dMax.toISOString().split('T')[0])}`; fLeft = (difDias(projIni, f.dMin) / totalProjDias) * 100; fWidth = Math.max((difDias(f.dMin, f.dMax) / totalProjDias) * 100, 0.5); }
                 
-                // Row da Frente com Edição
-                html += `<tr class="frente-row"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider">◪ ${f.nome}</td><td class="px-4 py-3 text-[10px] font-bold text-slate-600">${dataText}</td><td class="px-2 py-3 text-center font-black text-blue-700 text-sm">${avg}%</td><td class="px-4 py-3"></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-3 w-full h-full relative">${f.dMin ? `<div class="absolute top-4 bottom-4 rounded-md bg-slate-400 z-10 shadow-sm" style="left: ${fLeft}%; width: ${fWidth}%;"></div>` : ''}</div></td><td class="px-4 py-3 text-right"><button onclick="abrirEditarFrente('${f.nome}')" class="text-blue-500 hover:text-blue-700 transition-colors text-lg mr-2" title="Editar Frente">✏️</button><button onclick="deletarFrente('${f.nome}')" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Excluir Frente">🗑️</button></td></tr>`;
+                // Criação de um ID limpo para ser usado no controle do recolher/expandir
+                const safeFrenteId = `frente-${f.nome.replace(/\W/g, '')}`;
+
+                html += `<tr class="frente-row" onclick="toggleFrente('${safeFrenteId}')"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider select-none"><span id="icon-${safeFrenteId}" class="inline-block transition-transform duration-200 mr-1 text-slate-400">▼</span> ◪ ${f.nome}</td><td class="px-4 py-3 text-[10px] font-bold text-slate-600 select-none">${dataText}</td><td class="px-2 py-3 text-center font-black text-blue-700 text-sm select-none">${avg}%</td><td class="px-4 py-3"></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle select-none">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-3 w-full h-full relative">${f.dMin ? `<div class="absolute top-4 bottom-4 rounded-md bg-slate-400 z-10 shadow-sm" style="left: ${fLeft}%; width: ${fWidth}%;"></div>` : ''}</div></td><td class="px-4 py-3 text-right"><button onclick="abrirEditarFrente('${f.nome}'); event.stopPropagation();" class="text-blue-500 hover:text-blue-700 transition-colors text-lg mr-2" title="Editar Frente">✏️</button><button onclick="deletarFrente('${f.nome}'); event.stopPropagation();" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Excluir Frente">🗑️</button></td></tr>`;
                 
                 f.tarefas.sort((a,b)=>new Date(a.inicio)-new Date(b.inicio)).forEach(t => {
                     const resp = p.equipe?.find(u=>u.id==t.respId)?.nome||'Não Atribuído'; const st = statusDaTarefa(t.inicio, t.fim, t.progresso);
                     let tLeft = (difDias(projIni, new Date(t.inicio+"T12:00:00")) / totalProjDias) * 100; let tWidth = Math.max((difDias(new Date(t.inicio+"T12:00:00"), new Date(t.fim+"T12:00:00")) / totalProjDias) * 100, 0.5);
-                    html += `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-2 bottom-2 rounded-md shadow-sm ${classColor(st,'bg')} z-10 overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%;"><div class="h-full bg-black/20" style="width: ${t.progresso}%;"></div></div>${t.progresso > 10 ? `<span class="absolute top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-700 z-30 drop-shadow-md" style="left: calc(${tLeft} + ${tWidth}% + 4px);">${t.progresso}%</span>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap"><button onclick="editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
+                    
+                    // Adiciona a classe task-of-{ID} para controle de visibilidade
+                    html += `<tr class="hover:bg-slate-50 transition-colors task-of-${safeFrenteId}"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-2 bottom-2 rounded-md shadow-sm ${classColor(st,'bg')} z-10 overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%;"><div class="h-full bg-black/20" style="width: ${t.progresso}%;"></div></div>${t.progresso > 10 ? `<span class="absolute top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-700 z-30 drop-shadow-md" style="left: calc(${tLeft} + ${tWidth}% + 4px);">${t.progresso}%</span>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap"><button onclick="editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
                 });
             });
             tbody.innerHTML = html;
@@ -685,46 +693,34 @@
 
         window.updProg = function(taskId, val) { let num = parseInt(val); if(isNaN(num)||num<0) num=0; if(num>100) num=100; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const t = p.tarefas.find(x => x.id === taskId); if(t) { t.progresso = num; renderCronogramaFrentes(p); window.saveToCloud(); } }
 
-        // =========================================================
-        // GESTÃO DE MODAIS E EDIÇÕES
-        // =========================================================
+        // FORMULÁRIOS E MODAIS
         window.fecharModal = (id) => document.getElementById(id).classList.add('hidden');
-        
-        // PROJETO
         window.abrirModalProjeto = () => { if(window.CLIENTES_DB.length === 0) { alert("Cadastre um Cliente primeiro na aba Clientes."); return; } document.getElementById('modal-projeto').classList.remove('hidden'); document.getElementById('form-projeto').reset(); document.getElementById('np-id').value = ""; document.getElementById('modal-projeto-titulo').textContent = "Criar Novo Projeto"; document.getElementById('btn-salvar-projeto').textContent = "Criar Projeto"; }
         window.editarProjeto = (id) => { const p = window.PROJETOS_DB.find(x => x.id === id); if(!p) return; document.getElementById('modal-projeto').classList.remove('hidden'); document.getElementById('np-id').value = p.id; document.getElementById('np-nome').value = p.nome; document.getElementById('np-cliente').value = p.clienteId; document.getElementById('np-area').value = p.area || ""; document.getElementById('np-inicio').value = p.inicio; document.getElementById('np-fim').value = p.fim; document.getElementById('modal-projeto-titulo').textContent = "Editar Projeto"; document.getElementById('btn-salvar-projeto').textContent = "Salvar Alterações"; }
-        window.salvarProjeto = () => { const id = document.getElementById('np-id').value, nome = document.getElementById('np-nome').value, clienteId = document.getElementById('np-cliente').value, area = document.getElementById('np-area').value, ini = document.getElementById('np-inicio').value, fim = document.getElementById('np-fim').value; if(!nome||!ini||!fim||!clienteId) return; if(id) { const p = window.PROJETOS_DB.find(x => x.id === id); if(p) { p.nome=nome; p.clienteId=clienteId; p.area=area; p.inicio=ini; p.fim=fim; } } else { window.PROJETOS_DB.push({ id:"P"+Math.floor(Math.random()*100000), nome, clienteId, area, inicio:ini, fim, frentes: [], equipe: [], tarefas:[], relatorio:"" }); } window.carregarListasBase(); fecharModal('modal-projeto'); navGlobal('portfolio'); window.saveToCloud(); }
-        window.deletarProjeto = (id) => { if(confirm("Deseja excluir este projeto permanentemente?")) { window.PROJETOS_DB = window.PROJETOS_DB.filter(p => p.id !== id); window.carregarListasBase(); if(window.state.activeProjectId === id) navGlobal('portfolio'); else renderGlobal(); window.saveToCloud(); } }
+        window.salvarProjeto = () => {
+            const id = document.getElementById('np-id').value, nome = document.getElementById('np-nome').value, clienteId = document.getElementById('np-cliente').value, area = document.getElementById('np-area').value, ini = document.getElementById('np-inicio').value, fim = document.getElementById('np-fim').value;
+            if(!nome||!ini||!fim||!clienteId) return;
+            if(id) { const p = window.PROJETOS_DB.find(x => x.id === id); if(p) { p.nome=nome; p.clienteId=clienteId; p.area=area; p.inicio=ini; p.fim=fim; } } 
+            else { window.PROJETOS_DB.push({ id:"P"+Math.floor(Math.random()*100000), nome, clienteId, area, inicio:ini, fim, frentes: [], equipe: [], tarefas:[], relatorio:"" }); }
+            window.carregarListasBase(); fecharModal('modal-projeto'); navGlobal('portfolio'); window.saveToCloud();
+        }
+        window.deletarProjeto = (id) => { if(confirm("ATENÇÃO: Você está prestes a excluir este projeto.\nDeseja continuar?")) { if(confirm("DUPLA CONFIRMAÇÃO: Tem certeza? O projeto e todas suas tarefas serão apagados permanentemente.")) { window.PROJETOS_DB = window.PROJETOS_DB.filter(p => p.id !== id); window.carregarListasBase(); if(window.state.activeProjectId === id) navGlobal('portfolio'); else renderGlobal(); window.saveToCloud(); } } }
 
-        // CLIENTE
         window.abrirModalCliente = () => { document.getElementById('modal-cliente').classList.remove('hidden'); document.getElementById('form-cliente').reset(); document.getElementById('nc-id').value = ""; document.getElementById('modal-cliente-titulo').textContent = "Cadastrar Cliente"; }
         window.editarCliente = (id) => { const c = window.CLIENTES_DB.find(x => x.id == id); if(!c) return; document.getElementById('modal-cliente').classList.remove('hidden'); document.getElementById('nc-id').value = c.id; document.getElementById('nc-nome').value = c.nome; document.getElementById('nc-cnpj').value = c.cnpj || ""; document.getElementById('nc-sponsor').value = c.sponsor || ""; document.getElementById('modal-cliente-titulo').textContent = "Editar Cliente"; }
         window.salvarCliente = () => { const id = document.getElementById('nc-id').value, nome = document.getElementById('nc-nome').value, cnpj = document.getElementById('nc-cnpj').value, sponsor = document.getElementById('nc-sponsor').value; if(!nome) return; if(id) { const c = window.CLIENTES_DB.find(x => x.id == id); if(c) { c.nome = nome; c.cnpj = cnpj; c.sponsor = sponsor; } } else { const newId = window.CLIENTES_DB.length > 0 ? Math.max(...window.CLIENTES_DB.map(x=>x.id)) + 1 : 1; window.CLIENTES_DB.push({ id: newId, nome, cnpj, sponsor }); } fecharModal('modal-cliente'); window.carregarListasBase(); renderGlobal(); window.saveToCloud(); }
-        window.deletarCliente = (id) => { if(window.PROJETOS_DB.some(p => p.clienteId == id)) { alert("Impossível excluir. Cliente possui projetos."); return; } if(confirm("Excluir cliente?")) { window.CLIENTES_DB = window.CLIENTES_DB.filter(c => c.id != id); window.carregarListasBase(); renderGlobal(); window.saveToCloud(); } }
+        window.deletarCliente = (id) => { if(window.PROJETOS_DB.some(p => p.clienteId == id)) { alert("Impossível excluir. Cliente possui projetos."); return; } if(confirm("Excluir cliente da base global?")) { window.CLIENTES_DB = window.CLIENTES_DB.filter(c => c.id != id); window.carregarListasBase(); renderGlobal(); window.saveToCloud(); } }
 
-        // FRENTES (MACROATIVIDADE)
         window.abrirModalFrente = () => { document.getElementById('modal-frente').classList.remove('hidden'); document.getElementById('nf-nome').value = ""; }
         window.salvarMacro = () => { const n = document.getElementById('nf-nome').value.trim(); if(!n) return; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); if(!p.frentes) p.frentes = []; if(!p.frentes.includes(n)) p.frentes.push(n); fecharModal('modal-frente'); renderProject(); window.saveToCloud(); }
         window.abrirEditarFrente = (nome) => { document.getElementById('modal-editar-frente').classList.remove('hidden'); document.getElementById('ef-nome-antigo').value = nome; document.getElementById('ef-nome-novo').value = nome; }
-        window.salvarEdicaoFrente = () => {
-            const antigo = document.getElementById('ef-nome-antigo').value; const novo = document.getElementById('ef-nome-novo').value.trim(); if(!novo) return;
-            const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId);
-            const idx = p.frentes.indexOf(antigo); if(idx > -1) p.frentes[idx] = novo;
-            p.tarefas.forEach(t => { if(t.frente === antigo) t.frente = novo; });
-            fecharModal('modal-editar-frente'); renderProject(); window.saveToCloud();
-        }
-        window.deletarFrente = (nome) => {
-            const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId);
-            const temTarefas = p.tarefas.some(t => t.frente === nome);
-            let msg = `Deseja excluir a macroatividade "${nome}"?`;
-            if(temTarefas) msg += `\n\nATENÇÃO: As tarefas desta frente NÃO serão apagadas, mas ficarão sem grupo (Geral).`;
-            if(confirm(msg)) { p.frentes = p.frentes.filter(f => f !== nome); p.tarefas.forEach(t => { if(t.frente === nome) t.frente = ''; }); renderProject(); window.saveToCloud(); }
-        }
+        window.salvarEdicaoFrente = () => { const antigo = document.getElementById('ef-nome-antigo').value; const novo = document.getElementById('ef-nome-novo').value.trim(); if(!novo) return; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const idx = p.frentes.indexOf(antigo); if(idx > -1) p.frentes[idx] = novo; p.tarefas.forEach(t => { if(t.frente === antigo) t.frente = novo; }); fecharModal('modal-editar-frente'); renderProject(); window.saveToCloud(); }
+        window.deletarFrente = (nome) => { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const temTarefas = p.tarefas.some(t => t.frente === nome); let msg = `Deseja excluir a macroatividade "${nome}"?`; if(temTarefas) msg += `\n\nATENÇÃO: As tarefas desta frente NÃO serão apagadas, mas ficarão sem grupo (Geral).`; if(confirm(msg)) { p.frentes = p.frentes.filter(f => f !== nome); p.tarefas.forEach(t => { if(t.frente === nome) t.frente = ''; }); renderProject(); window.saveToCloud(); } }
 
-        // TAREFAS
         window.abrirModalTarefa = () => { 
             const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId);
-            if(!p.frentes || p.frentes.length === 0) { alert("Crie uma Macroatividade primeiro!"); return; } if(!p.equipe || p.equipe.length === 0) { alert("Sua equipe de projeto está vazia!"); return; }
+            if(!p.frentes || p.frentes.length === 0) { alert("Crie uma Macroatividade (Botão Branco) primeiro para vincular a tarefa!"); return; }
+            if(!p.equipe || p.equipe.length === 0) { alert("Sua equipe de obra está vazia!\nVá na aba 'Equipe do Projeto' à esquerda e adicione os membros para atribuir as tarefas."); return; }
             document.getElementById('modal-tarefa').classList.remove('hidden'); document.getElementById('form-tarefa').reset(); document.getElementById('nt-id').value=""; document.getElementById('modal-tarefa-titulo').textContent="Nova Tarefa"; 
             document.getElementById('nt-frente').innerHTML = p.frentes.map(f => `<option value="${f}">${f}</option>`).join(''); document.getElementById('nt-resp').innerHTML = p.equipe.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
         }
@@ -735,20 +731,12 @@
         window.salvarTarefa = () => { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const id = document.getElementById('nt-id').value, frente = document.getElementById('nt-frente').value, edt = document.getElementById('nt-edt').value, nome = document.getElementById('nt-nome').value, respId = document.getElementById('nt-resp').value, inicio = document.getElementById('nt-inicio').value, fim = document.getElementById('nt-fim').value; if(!frente || !nome || !inicio || !fim || !respId) return; if(id) { const t = p.tarefas.find(x=>x.id==id); if(t) { t.frente=frente; t.edt=edt; t.nome=nome; t.respId=respId; t.inicio=inicio; t.fim=fim; } } else { const maxId = p.tarefas.length?Math.max(...p.tarefas.map(x=>x.id))+1:1; p.tarefas.push({ id: maxId, frente, edt, nome, respId, inicio, fim, progresso: 0 }); } fecharModal('modal-tarefa'); renderProject(); window.saveToCloud(); }
         window.deletarTarefa = (id) => { if(confirm("Apagar esta tarefa do cronograma?")) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); p.tarefas = p.tarefas.filter(t => t.id !== id); renderProject(); window.saveToCloud(); } }
 
-        // EQUIPE (MEMBROS)
         window.adicionarMembro = function(e) { e.preventDefault(); const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const nome = document.getElementById('rec-nome').value, papel = document.getElementById('rec-papel').value; const novoId = p.equipe && p.equipe.length > 0 ? Math.max(...p.equipe.map(x=>x.id)) + 1 : 1; if(!p.equipe) p.equipe = []; p.equipe.push({ id: novoId, nome, papel }); document.getElementById('form-recurso').reset(); renderProject(); window.saveToCloud(); }
-        window.abrirEditarMembro = function(id) {
-            const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const m = p.equipe.find(x => x.id === id); if(!m) return;
-            document.getElementById('modal-editar-membro').classList.remove('hidden'); document.getElementById('em-id').value = m.id; document.getElementById('em-nome').value = m.nome; document.getElementById('em-papel').value = m.papel;
-        }
-        window.salvarEdicaoMembro = function() {
-            const id = parseInt(document.getElementById('em-id').value); const nome = document.getElementById('em-nome').value.trim(); const papel = document.getElementById('em-papel').value.trim(); if(!nome || !papel) return;
-            const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const m = p.equipe.find(x => x.id === id); if(m) { m.nome = nome; m.papel = papel; }
-            fecharModal('modal-editar-membro'); renderProject(); window.saveToCloud();
-        }
-        window.removerMembro = function(mId) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); if(p.tarefas.some(t => t.respId == mId)) { alert("Membro possui tarefas."); return; } if(confirm("Remover membro?")) { p.equipe = p.equipe.filter(m => m.id !== mId); renderProject(); window.saveToCloud(); } }
+        window.abrirEditarMembro = function(id) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const m = p.equipe.find(x => x.id === id); if(!m) return; document.getElementById('modal-editar-membro').classList.remove('hidden'); document.getElementById('em-id').value = m.id; document.getElementById('em-nome').value = m.nome; document.getElementById('em-papel').value = m.papel; }
+        window.salvarEdicaoMembro = function() { const id = parseInt(document.getElementById('em-id').value); const nome = document.getElementById('em-nome').value.trim(); const papel = document.getElementById('em-papel').value.trim(); if(!nome || !papel) return; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const m = p.equipe.find(x => x.id === id); if(m) { m.nome = nome; m.papel = papel; } fecharModal('modal-editar-membro'); renderProject(); window.saveToCloud(); }
+        window.removerMembro = function(mId) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); if(p.tarefas.some(t => t.respId == mId)) { alert("Atribua as tarefas deste membro a outro responsável antes de removê-lo da equipe."); return; } if(confirm("Remover membro desta obra?")) { p.equipe = p.equipe.filter(m => m.id !== mId); renderProject(); window.saveToCloud(); } }
         
-        window.salvarRelatorio = () => { window.PROJETOS_DB.find(x=>x.id===window.state.activeProjectId).relatorio = document.getElementById('relatorio-text').value; const btn = event.target; const txt = btn.innerHTML; btn.innerHTML = "✅ Salvo!"; btn.classList.replace('bg-slate-800', 'bg-emerald-600'); window.saveToCloud(); setTimeout(() => { btn.innerHTML = txt; btn.classList.replace('bg-emerald-600', 'bg-slate-800'); }, 2000); }
+        window.salvarRelatorio = () => { window.PROJETOS_DB.find(x=>x.id===window.state.activeProjectId).relatorio = document.getElementById('relatorio-text').value; const btn = event.target; const txt = btn.innerHTML; btn.innerHTML = "✅ Salvo na Nuvem!"; btn.classList.replace('bg-slate-800', 'bg-emerald-600'); window.saveToCloud(); setTimeout(() => { btn.innerHTML = txt; btn.classList.replace('bg-emerald-600', 'bg-slate-800'); }, 2000); }
 
     </script>
 </body>
