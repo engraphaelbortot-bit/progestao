@@ -378,14 +378,6 @@
         </form>
     </div>
 
-    <div id="modal-frente" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
-        <form class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in" onsubmit="event.preventDefault(); window.salvarMacro();">
-            <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Nova Macroatividade</h2><button type="button" onclick="window.fecharModal('modal-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
-            <div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div>
-            <div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button type="button" onclick="window.fecharModal('modal-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button type="submit" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg text-sm hover:bg-slate-900 shadow-md transition-colors">Salvar Frente</button></div>
-        </form>
-    </div>
-
     <div id="modal-tarefa" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
         <form id="form-tarefa" class="bg-white rounded-xl shadow-2xl w-full max-w-xl border border-slate-200 animate-fade-in" onsubmit="event.preventDefault(); window.salvarTarefa();">
             <div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50"><h2 class="text-xl font-black text-slate-800" id="modal-tarefa-titulo">Nova Tarefa</h2><button type="button" onclick="window.fecharModal('modal-tarefa')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
@@ -506,7 +498,10 @@
                     window.PROJETOS_DB = data.projetos || []; 
                     window.CLIENTES_DB = data.clientes || []; 
                 } else { 
-                    window.PROJETOS_DB = []; window.CLIENTES_DB = []; await window.saveToCloud(); 
+                    // Traz backup local se for a primeira vez criando conta
+                    const localBackup = JSON.parse(localStorage.getItem('progestao_db_backup_' + window.state.currentUser) || '{}'); 
+                    window.PROJETOS_DB = localBackup.projetos || []; window.CLIENTES_DB = localBackup.clientes || []; 
+                    await window.saveToCloud(); 
                 }
                 
                 const cStatus = document.getElementById('cloud-status'); cStatus.innerHTML = "🟢 Nuvem Ativa"; cStatus.classList.remove('text-slate-500', 'text-rose-500'); cStatus.classList.add('text-emerald-600');
@@ -537,7 +532,7 @@
             document.getElementById('loader-overlay').classList.add('hidden'); 
             const app = document.getElementById('app-container');
             app.classList.remove('hidden');
-            app.classList.add('flex', 'flex-row'); // Correção definitiva do CSS de Empilhamento
+            app.classList.add('flex', 'flex-row'); // Layout Fixo
             window.carregarListasBase(); 
             window.navGlobal('portfolio'); 
         }
@@ -661,6 +656,7 @@
                 }).join('');
             } else if(window.state.currentView === 'insights') {
                 let [atr, risco, prazo, tMedio, tDesvio, stConc, stAnd, stAtr, stNao] = [0,0,0,0,0,0,0,0,0]; let projRows = '', workload = {}, hConsultor = {}, hCliente = {}; const fContainer = document.getElementById('insight-project-filters');
+                
                 if(window.PROJETOS_DB.length === 0) {
                     fContainer.innerHTML = '<span class="text-xs text-slate-400">Nenhum projeto.</span>'; document.getElementById('global-timeline-body').innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Sem projetos.</td></tr>`; document.getElementById('insight-workload-body').innerHTML = `<tr><td colspan="5" class="py-6 px-4 text-center text-slate-500">Equipe vazia.</td></tr>`;
                 } else {
