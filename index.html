@@ -107,11 +107,11 @@
     <div id="loader-overlay" class="absolute inset-0 bg-slate-900 z-[200] flex flex-col items-center justify-center text-white transition-opacity duration-500 hidden">
         <div class="text-6xl mb-4 animate-bounce">☁️</div>
         <h2 class="text-2xl font-bold mb-2">Iniciando ProGestão</h2>
-        <p class="text-slate-400 text-sm">Conectando ao banco de dados seguro...</p>
+        <p class="text-slate-400 text-sm">Verificando segurança e carregando dados...</p>
     </div>
 
     <!-- CONTAINER DA APLICAÇÃO -->
-    <div id="app-container" class="hidden h-screen w-full relative">
+    <div id="app-container" class="hidden h-screen w-full overflow-hidden relative">
         <aside class="w-20 lg:w-64 bg-white border-r border-slate-200 flex flex-col z-20 flex-shrink-0 transition-all duration-300">
             <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-200">
                 <span class="text-3xl font-bold text-blue-600">≡</span>
@@ -176,7 +176,7 @@
                 <section id="view-portfolio" class="block animate-fade-in max-w-7xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 no-print">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">Seus Projetos</h1><p class="text-slate-500 text-sm mt-1">Gerencie e acompanhe o progresso geral do seu portfólio.</p></div>
-                        <button onclick="window.abrirModalProjeto()" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5"><span class="mr-2 font-black text-lg">+</span> Novo Projeto</button>
+                        <button onclick="window.abrirModalProjeto()" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5 no-print"><span class="mr-2 font-black text-lg">+</span> Novo Projeto</button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolio-grid"></div>
                 </section>
@@ -185,7 +185,7 @@
                 <section id="view-clientes" class="hidden animate-fade-in max-w-7xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 no-print">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center">🏢 Base de Clientes</h1><p class="text-slate-500 text-sm mt-1">Cadastre clientes para vinculá-los aos seus projetos.</p></div>
-                        <button onclick="window.abrirModalCliente()" class="mt-4 md:mt-0 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5"><span class="mr-2 font-black text-lg">+</span> Cadastrar Cliente</button>
+                        <button onclick="window.abrirModalCliente()" class="mt-4 md:mt-0 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5 no-print"><span class="mr-2 font-black text-lg">+</span> Cadastrar Cliente</button>
                     </div>
                     <div class="glass-card overflow-hidden shadow-sm">
                         <div class="overflow-x-auto">
@@ -397,7 +397,7 @@
     <!-- JAVASCRIPT PRINCIPAL E FIREBASE AUTH -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
@@ -424,7 +424,7 @@
         } catch(e) { console.error("Erro Firebase", e); }
 
         // ==========================================
-        // LOGIN (FIREBASE AUTH) E COFRE LOCAL
+        // LOGIN E COFRE NUVEM/LOCAL
         // ==========================================
         let isCreatingAccount = false;
         
@@ -447,25 +447,51 @@
             const btnText = btn.textContent;
             btn.textContent = "Aguarde..."; btn.disabled = true;
 
-            try {
-                if (isCreatingAccount) {
-                    await createUserWithEmailAndPassword(auth, emailFormatado, p);
-                    alert("Conta criada com sucesso!");
-                } else {
-                    await signInWithEmailAndPassword(auth, emailFormatado, p);
+            if (auth) {
+                try {
+                    // CONFIGURA A SESSÃO PARA SOBREVIVER AO F5, MAS EXPIRAR AO FECHAR A GUIA/NAVEGADOR
+                    await setPersistence(auth, browserSessionPersistence);
+                    
+                    if (isCreatingAccount) {
+                        await createUserWithEmailAndPassword(auth, emailFormatado, p);
+                        alert("Conta criada com sucesso!");
+                    } else {
+                        await signInWithEmailAndPassword(auth, emailFormatado, p);
+                    }
+                    // O onAuthStateChanged vai capturar e liberar a entrada
+                } catch (error) {
+                    if(error.code === 'auth/email-already-in-use') { alert("Este usuário já existe! Clique em 'Voltar ao Login' para entrar."); }
+                    else if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') { alert("Atenção: Usuário ou senha incorretos."); }
+                    else if(error.code === 'auth/weak-password') { alert("A senha deve ter pelo menos 6 caracteres."); }
+                    else { 
+                        alert("Erro na nuvem. Entrando no Modo Local do Computador...");
+                        window.iniciarSessaoLocal(u);
+                    }
                 }
-            } catch (error) {
-                if(error.code === 'auth/email-already-in-use') { alert("Este usuário já existe! Clique em 'Voltar ao Login' para entrar."); }
-                else if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') { alert("Atenção: Usuário ou senha incorretos, ou você precisa ativar o painel no Firebase."); }
-                else if(error.code === 'auth/weak-password') { alert("A senha deve ter pelo menos 6 caracteres."); }
-                else { alert("Erro de nuvem. Entrando em Modo Local..."); }
-                
-                window.state.currentUser = u.split('@')[0];
-                document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
-                document.getElementById('login-screen').classList.add('hidden'); document.getElementById('loader-overlay').classList.remove('hidden');
-                window.fallBackLocal();
+            } else {
+                let localUsers = JSON.parse(localStorage.getItem('progestao_users') || '[]');
+                if (isCreatingAccount) {
+                    if (localUsers.find(acc => acc.user === u)) { alert("Usuário já existe! Faça login."); btn.textContent = btnText; btn.disabled = false; return; }
+                    localUsers.push({ user: u, pass: p }); localStorage.setItem('progestao_users', JSON.stringify(localUsers)); alert("Conta criada localmente!");
+                    window.iniciarSessaoLocal(u);
+                } else {
+                    if ((u === 'adm' && p === 'adm123') || localUsers.find(acc => acc.user === u && acc.pass === p)) {
+                        window.iniciarSessaoLocal(u);
+                    } else {
+                        alert("Usuário ou senha incorretos.");
+                    }
+                }
             }
             btn.textContent = btnText; btn.disabled = false;
+        }
+
+        window.iniciarSessaoLocal = function(username) {
+            sessionStorage.setItem('progestao_local_user', username);
+            window.state.currentUser = username.split('@')[0];
+            document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
+            document.getElementById('login-screen').classList.add('hidden'); 
+            document.getElementById('loader-overlay').classList.remove('hidden');
+            window.fallBackLocal();
         }
 
         if(auth) {
@@ -474,18 +500,35 @@
                     userId = user.uid; 
                     window.state.currentUser = user.email.split('@')[0];
                     document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
-                    document.getElementById('login-screen').classList.add('hidden'); document.getElementById('loader-overlay').classList.remove('hidden');
+                    document.getElementById('login-screen').classList.add('hidden'); 
+                    document.getElementById('loader-overlay').classList.remove('hidden');
                     await window.loadFromCloud(); 
-                } 
+                } else {
+                    let localUser = sessionStorage.getItem('progestao_local_user');
+                    if (localUser) {
+                        window.iniciarSessaoLocal(localUser);
+                    } else {
+                        document.getElementById('app-container').classList.add('hidden');
+                        document.getElementById('login-screen').classList.remove('hidden');
+                        document.getElementById('loader-overlay').classList.add('hidden');
+                    }
+                }
             }); 
+        } else {
+            window.addEventListener('DOMContentLoaded', () => {
+                let localUser = sessionStorage.getItem('progestao_local_user');
+                if (localUser) { window.iniciarSessaoLocal(localUser); }
+                else { document.getElementById('login-screen').classList.remove('hidden'); }
+            });
         }
 
         window.fazerLogout = function() {
             if(confirm("Deseja sair do sistema?")) {
                 if(auth) auth.signOut();
+                sessionStorage.removeItem('progestao_local_user');
                 window.state.currentUser = null; 
                 const app = document.getElementById('app-container');
-                app.classList.remove('flex', 'flex-row'); 
+                app.classList.remove('flex'); 
                 app.classList.add('hidden'); 
                 document.getElementById('login-screen').classList.remove('hidden'); 
                 document.getElementById('form-login').reset();
@@ -506,7 +549,6 @@
                     window.PROJETOS_DB = localBackup.projetos || []; window.CLIENTES_DB = localBackup.clientes || []; 
                     await window.saveToCloud(); 
                 }
-                
                 const cStatus = document.getElementById('cloud-status'); cStatus.innerHTML = "🟢 Nuvem Ativa"; cStatus.classList.remove('text-slate-500', 'text-rose-500'); cStatus.classList.add('text-emerald-600');
                 window.finalizarCarregamento();
             } catch (e) { window.fallBackLocal(); }
@@ -515,7 +557,6 @@
         window.saveToCloud = async function() {
             localStorage.setItem('progestao_db_backup_' + window.state.currentUser, JSON.stringify({ projetos: window.PROJETOS_DB, clientes: window.CLIENTES_DB }));
             if(!db || !userId) return;
-            
             const statusEl = document.getElementById('cloud-status'); statusEl.innerHTML = "⏳ Salvando..."; statusEl.classList.replace('text-emerald-600', 'text-amber-500');
             try { 
                 const docRef = doc(db, 'progestao_dados', userId); 
@@ -534,7 +575,7 @@
             document.getElementById('loader-overlay').classList.add('hidden'); 
             const app = document.getElementById('app-container');
             app.classList.remove('hidden');
-            app.classList.add('flex', 'flex-row'); // Layout Fixo Consertado
+            app.classList.add('flex'); 
             window.carregarListasBase(); 
             window.navGlobal('portfolio'); 
         }
@@ -641,27 +682,14 @@
             const isGlob = window.state.viewType === 'global'; document.getElementById(`view-${isGlob ? '' : 'proj-'}${window.state.currentView}`).classList.remove('hidden'); document.getElementById(`nav-${isGlob ? '' : 'proj-'}${window.state.currentView}`)?.classList.add('active'); document.getElementById('sidebar-project-menu').classList.toggle('hidden', isGlob);
         }
 
-        // NOVIDADE: FUNÇÃO PARA DUPLICAR PROJETO
         window.duplicarProjeto = function(id) {
             if(confirm("Deseja duplicar este projeto com todos os seus dados (membros, cronograma e tarefas)?")) {
                 const original = window.PROJETOS_DB.find(x => x.id === id);
                 if(!original) return;
-                
-                // Cópia exata e profunda
                 const clone = JSON.parse(JSON.stringify(original));
-                clone.id = "P" + Math.floor(Math.random() * 1000000);
-                clone.nome = clone.nome + " (Cópia)";
-                
-                // Garante que as tarefas do clone tenham IDs únicos na base
-                if(clone.tarefas) {
-                    clone.tarefas.forEach(t => { t.id = Math.floor(Math.random() * 10000000); });
-                }
-                
-                window.PROJETOS_DB.push(clone);
-                window.carregarListasBase();
-                window.renderGlobal();
-                window.saveToCloud();
-                alert("Projeto duplicado com sucesso!");
+                clone.id = "P" + Math.floor(Math.random() * 1000000); clone.nome = clone.nome + " (Cópia)";
+                if(clone.tarefas) { clone.tarefas.forEach(t => { t.id = Math.floor(Math.random() * 10000000); }); }
+                window.PROJETOS_DB.push(clone); window.carregarListasBase(); window.renderGlobal(); window.saveToCloud(); alert("Projeto duplicado com sucesso!");
             }
         };
 
@@ -821,9 +849,7 @@
 
         window.updProg = function(taskId, val) { let num = parseInt(val); if(isNaN(num)||num<0) num=0; if(num>100) num=100; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const t = p.tarefas.find(x => x.id === taskId); if(t) { t.progresso = num; window.renderCronogramaFrentes(p); window.saveToCloud(); } }
 
-        // =========================================================
-        // GESTÃO DE MODAIS E FORMULÁRIOS
-        // =========================================================
+        // FORMULÁRIOS E MODAIS
         window.fecharModal = (id) => document.getElementById(id).classList.add('hidden');
         
         window.abrirModalProjeto = () => { if(window.CLIENTES_DB.length === 0) { alert("Cadastre um Cliente primeiro na aba Clientes."); return; } document.getElementById('modal-projeto').classList.remove('hidden'); document.getElementById('form-projeto').reset(); document.getElementById('np-id').value = ""; document.getElementById('modal-projeto-titulo').textContent = "Criar Novo Projeto"; document.getElementById('btn-salvar-projeto').textContent = "Criar Projeto"; }
