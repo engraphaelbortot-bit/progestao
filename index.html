@@ -57,9 +57,11 @@
         .filter-pill.active { background-color: #eff6ff; border-color: #3b82f6; color: #1d4ed8; font-weight: 700; }
         .filter-pill:hover:not(.active) { background-color: #f1f5f9; border-color: #cbd5e1; }
 
-        /* CSS DE IMPRESSÃO (PDF) */
+        /* ======================================================= */
+        /* CSS DE IMPRESSÃO (Resolve o problema do PDF cortado)    */
+        /* ======================================================= */
         @media print {
-            aside, header, #login-screen, #loader-overlay, .btn-excel, .no-print, .modal-overlay { display: none !important; }
+            aside, header, #login-screen, #loader-overlay, .btn-excel, .no-print, .modal-overlay, #sidebar-project-menu, button { display: none !important; }
             body, html, #app-container, main, #main-content, .flex-1, .overflow-y-auto, .overflow-x-auto, .overflow-hidden, section.block, .glass-card {
                 display: block !important; height: auto !important; min-height: auto !important; max-height: none !important;
                 overflow: visible !important; position: static !important; width: 100% !important; padding: 0 !important;
@@ -74,10 +76,10 @@
         }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden bg-slate-50">
+<body class="bg-slate-50 overflow-hidden h-screen w-full relative">
 
     <!-- TELA DE LOGIN -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-50 z-[300] flex flex-col items-center justify-center p-4">
+    <div id="login-screen" class="absolute inset-0 bg-slate-50 z-[300] flex flex-col items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-8 md:p-10 border border-slate-100 flex flex-col items-center text-center">
             <div class="mb-4"><span class="text-5xl font-bold text-blue-600">≡<span class="text-3xl text-indigo-400">✨</span></span></div>
             <h1 class="text-3xl font-black text-slate-800 tracking-tight mb-2">ProGestão</h1>
@@ -86,7 +88,7 @@
             <form id="form-login" class="w-full space-y-5" onsubmit="window.fazerLogin(event)">
                 <div class="text-left">
                     <label class="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">E-mail ou Usuário</label>
-                    <input type="text" id="login-email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Ex: adm">
+                    <input type="text" id="login-email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Ex: seunome@email.com ou adm">
                 </div>
                 <div class="text-left">
                     <label class="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">Senha</label>
@@ -102,14 +104,14 @@
     </div>
 
     <!-- TELA DE CARREGAMENTO -->
-    <div id="loader-overlay" class="fixed inset-0 bg-slate-900 z-[200] flex flex-col items-center justify-center text-white transition-opacity duration-500 hidden">
+    <div id="loader-overlay" class="absolute inset-0 bg-slate-900 z-[200] flex flex-col items-center justify-center text-white transition-opacity duration-500 hidden">
         <div class="text-6xl mb-4 animate-bounce">☁️</div>
         <h2 class="text-2xl font-bold mb-2">Iniciando ProGestão</h2>
-        <p class="text-slate-400 text-sm">Carregando ambiente de trabalho e banco de dados...</p>
+        <p class="text-slate-400 text-sm">Conectando ao banco de dados seguro...</p>
     </div>
 
     <!-- CONTAINER DA APLICAÇÃO -->
-    <div id="app-container" class="hidden flex-1 flex h-screen w-full overflow-hidden relative">
+    <div id="app-container" class="hidden h-screen w-full relative">
         <aside class="w-20 lg:w-64 bg-white border-r border-slate-200 flex flex-col z-20 flex-shrink-0 transition-all duration-300">
             <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-200">
                 <span class="text-3xl font-bold text-blue-600">≡</span>
@@ -134,16 +136,16 @@
             </nav>
             <div class="p-4 border-t border-slate-200 flex items-center justify-center lg:justify-start bg-slate-50 cursor-default">
                 <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">U</div>
-                <div class="ml-3 hidden lg:block">
-                    <p class="text-sm font-bold text-slate-700 leading-tight" id="sidebar-user-name">Usuário</p>
-                    <p class="text-[10px] text-slate-500 font-medium">Workspace</p>
+                <div class="ml-3 hidden lg:block overflow-hidden">
+                    <p class="text-sm font-bold text-slate-700 leading-tight truncate" id="sidebar-user-name">Usuário</p>
+                    <p class="text-[10px] text-slate-500 font-medium">Conta Cloud</p>
                 </div>
                 <button onclick="window.fazerLogout()" class="ml-auto text-slate-400 hover:text-rose-500 hidden lg:block" title="Sair do sistema">🚪</button>
             </div>
         </aside>
 
         <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
-            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10 shadow-sm">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10 shadow-sm no-print">
                 <div class="flex items-center relative flex-1 max-w-md">
                     <select id="project-selector" onchange="window.mudarContexto(this.value)" class="bg-transparent text-slate-800 text-lg lg:text-xl font-black focus:ring-0 focus:outline-none cursor-pointer appearance-none w-full pr-8 z-10 relative">
                         <option value="global">🏢 Portfólio Global da Empresa</option>
@@ -172,18 +174,18 @@
                 
                 <!-- VISÃO: PORTFÓLIO -->
                 <section id="view-portfolio" class="block animate-fade-in max-w-7xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 no-print">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">Seus Projetos</h1><p class="text-slate-500 text-sm mt-1">Gerencie e acompanhe o progresso geral do seu portfólio.</p></div>
-                        <button onclick="window.abrirModalProjeto()" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5 no-print"><span class="mr-2 font-black text-lg">+</span> Novo Projeto</button>
+                        <button onclick="window.abrirModalProjeto()" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5"><span class="mr-2 font-black text-lg">+</span> Novo Projeto</button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolio-grid"></div>
                 </section>
 
                 <!-- VISÃO: CLIENTES -->
                 <section id="view-clientes" class="hidden animate-fade-in max-w-7xl mx-auto">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 no-print">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center">🏢 Base de Clientes</h1><p class="text-slate-500 text-sm mt-1">Cadastre clientes para vinculá-los aos seus projetos.</p></div>
-                        <button onclick="window.abrirModalCliente()" class="mt-4 md:mt-0 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5 no-print"><span class="mr-2 font-black text-lg">+</span> Cadastrar Cliente</button>
+                        <button onclick="window.abrirModalCliente()" class="mt-4 md:mt-0 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5"><span class="mr-2 font-black text-lg">+</span> Cadastrar Cliente</button>
                     </div>
                     <div class="glass-card overflow-hidden shadow-sm">
                         <div class="overflow-x-auto">
@@ -379,7 +381,7 @@
     <div id="modal-frente" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
         <form class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in" onsubmit="event.preventDefault(); window.salvarMacro();">
             <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Nova Macroatividade</h2><button type="button" onclick="window.fecharModal('modal-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
-            <div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade (Agrupador) *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div>
+            <div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div>
             <div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button type="button" onclick="window.fecharModal('modal-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button type="submit" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg text-sm hover:bg-slate-900 shadow-md transition-colors">Salvar Frente</button></div>
         </form>
     </div>
@@ -392,17 +394,17 @@
         </form>
     </div>
 
-    <!-- JAVASCRIPT PRINCIPAL -->
+    <!-- JAVASCRIPT PRINCIPAL E FIREBASE AUTH -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // 1. INSIRA SUAS CHAVES DO FIREBASE AQUI
+        // CONFIGURAÇÃO DO FIREBASE (INJETADA)
         // ==========================================
         const MEU_FIREBASE_CONFIG = {
-            apiKey: "AIzaSyBvo2JPCQ8eI0-lwj4QPtGNwvKbkVnX6nw",
+            apiKey: "AIzaSyBvo2JPCQ8e18-lWj4QPtGNwvKbkVnX6nw",
             authDomain: "progest-99892.firebaseapp.com",
             projectId: "progest-99892",
             storageBucket: "progest-99892.firebasestorage.app",
@@ -413,8 +415,19 @@
         window.CLIENTES_DB = []; window.PROJETOS_DB = [];
         window.state = { viewType: 'global', currentView: 'portfolio', activeProjectId: null, hoje: new Date(), insightsSelectedProjects: [], currentUser: null };
         window.charts = { curvaS: null, donut: null, chartConsultor: null, chartCliente: null, globalCurvaS: null };
+        
+        let app, auth, db, userId;
+        try { 
+            app = initializeApp(MEU_FIREBASE_CONFIG); 
+            auth = getAuth(app); 
+            db = getFirestore(app); 
+        } catch(e) { console.error("Erro Firebase", e); }
 
+        // ==========================================
+        // LOGIN (FIREBASE AUTH) E COFRE LOCAL
+        // ==========================================
         let isCreatingAccount = false;
+        
         window.alternarCriarConta = function() {
             isCreatingAccount = !isCreatingAccount;
             const btnSubmit = document.getElementById('btn-login-submit'), btnToggle = document.getElementById('btn-login-toggle'), title = document.getElementById('login-title'), forgotPass = document.getElementById('forgot-pass-container');
@@ -422,70 +435,93 @@
             else { title.textContent = "Login de Acesso"; btnSubmit.textContent = "Entrar"; btnSubmit.classList.replace('bg-emerald-600', 'bg-blue-600'); btnSubmit.classList.replace('hover:bg-emerald-700', 'hover:bg-blue-700'); btnToggle.textContent = "Criar uma conta"; forgotPass.classList.remove('hidden'); }
         }
 
-        window.fazerLogin = function(e) {
+        window.fazerLogin = async function(e) {
             if(e) e.preventDefault(); 
-            const u = document.getElementById('login-email').value.trim(), p = document.getElementById('login-senha').value.trim();
-            let localUsers = JSON.parse(localStorage.getItem('progestao_users') || '[]');
-            if (isCreatingAccount) {
-                if (localUsers.find(acc => acc.user === u)) { alert("Usuário já existe! Faça login."); return; }
-                localUsers.push({ user: u, pass: p }); localStorage.setItem('progestao_users', JSON.stringify(localUsers)); alert("Conta criada! Acessando..."); window.autorizarEntrada(u);
-            } else {
-                if ((u === 'adm' && p === 'adm123') || localUsers.find(acc => acc.user === u && acc.pass === p)) window.autorizarEntrada(u); else alert("Usuário ou senha incorretos.");
+            const u = document.getElementById('login-email').value.trim();
+            const p = document.getElementById('login-senha').value.trim();
+            if(!u || !p) return;
+            
+            // Aceita "adm" ou "seuemail@xyz.com". Se for só "adm", converte internamente.
+            const emailFormatado = u.includes('@') ? u : `${u.toLowerCase()}@progestao.app`;
+            
+            const btn = document.getElementById('btn-login-submit');
+            const btnText = btn.textContent;
+            btn.textContent = "Aguarde..."; btn.disabled = true;
+
+            try {
+                if (isCreatingAccount) {
+                    await createUserWithEmailAndPassword(auth, emailFormatado, p);
+                    alert("Conta criada com sucesso!");
+                } else {
+                    await signInWithEmailAndPassword(auth, emailFormatado, p);
+                }
+            } catch (error) {
+                // FALLBACK: Se o firebase falhar, salva localmente e permite a entrada
+                if(error.code === 'auth/email-already-in-use') { alert("Este usuário já existe! Clique em 'Voltar ao Login' para entrar."); }
+                else if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') { alert("Atenção: Usuário ou senha incorretos, ou você precisa ativar o painel no Firebase."); }
+                else if(error.code === 'auth/weak-password') { alert("A senha deve ter pelo menos 6 caracteres."); }
+                else { alert("Erro de nuvem. Entrando em Modo Local..."); }
+                
+                // Libera entrada local
+                window.state.currentUser = u.split('@')[0];
+                document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
+                document.getElementById('login-screen').classList.add('hidden'); document.getElementById('loader-overlay').classList.remove('hidden');
+                window.fallBackLocal();
             }
+            btn.textContent = btnText; btn.disabled = false;
         }
 
-        window.autorizarEntrada = function(username) {
-            window.state.currentUser = username;
-            document.getElementById('sidebar-user-name').textContent = username === 'adm' ? "Administrador (adm)" : username;
-            document.getElementById('login-screen').classList.add('hidden'); document.getElementById('loader-overlay').classList.remove('hidden');
-            if(window.initDatabase) window.initDatabase(); 
+        if(auth) {
+            onAuthStateChanged(auth, async (user) => { 
+                if (user) { 
+                    userId = user.uid; // ID único real do usuário no Firebase
+                    window.state.currentUser = user.email.split('@')[0];
+                    document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
+                    document.getElementById('login-screen').classList.add('hidden'); document.getElementById('loader-overlay').classList.remove('hidden');
+                    await window.loadFromCloud(); 
+                } 
+            }); 
         }
 
         window.fazerLogout = function() {
             if(confirm("Deseja sair do sistema?")) {
-                window.state.currentUser = null; document.getElementById('app-container').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); document.getElementById('form-login').reset();
+                if(auth) auth.signOut();
+                window.state.currentUser = null; 
+                const app = document.getElementById('app-container');
+                app.classList.remove('flex', 'flex-row'); 
+                app.classList.add('hidden'); 
+                document.getElementById('login-screen').classList.remove('hidden'); 
+                document.getElementById('form-login').reset();
                 if(isCreatingAccount) window.alternarCriarConta();
             }
         }
 
-        let app, auth, db;
-        try { 
-            if (MEU_FIREBASE_CONFIG && MEU_FIREBASE_CONFIG.apiKey) { 
-                app = initializeApp(MEU_FIREBASE_CONFIG); 
-                auth = getAuth(app); 
-                db = getFirestore(app); 
-            } 
-        } catch(e) { console.warn("Firebase config error", e); }
-
-        window.initDatabase = async function() {
-            if(!auth || !db) { window.fallBackLocal(); return; }
-            try { await signInAnonymously(auth); } catch (error) { window.fallBackLocal(); }
-        }
-
-        if(auth) { onAuthStateChanged(auth, async (user) => { if (user && window.state.currentUser) { await window.loadFromCloud(); } }); }
-
         window.loadFromCloud = async function() {
             try {
-                // A mágica que salva cruzado nos PCs: Usa o nome do Usuário (adm) como caminho na Nuvem!
-                const docRef = doc(db, 'progestao_dados', "usuario_" + window.state.currentUser); 
+                // Puxa do Firebase usando o ID Real da Conta do cara
+                const docRef = doc(db, 'progestao_dados', userId); 
                 const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) { const data = docSnap.data(); window.PROJETOS_DB = data.projetos || []; window.CLIENTES_DB = data.clientes || []; } 
-                else { 
-                    const localBackup = JSON.parse(localStorage.getItem('progestao_db_backup_' + window.state.currentUser) || '{}'); 
-                    window.PROJETOS_DB = localBackup.projetos || []; window.CLIENTES_DB = localBackup.clientes || []; 
-                    await window.saveToCloud(); 
+                if (docSnap.exists()) { 
+                    const data = docSnap.data(); 
+                    window.PROJETOS_DB = data.projetos || []; 
+                    window.CLIENTES_DB = data.clientes || []; 
+                } else { 
+                    window.PROJETOS_DB = []; window.CLIENTES_DB = []; await window.saveToCloud(); 
                 }
+                
                 const cStatus = document.getElementById('cloud-status'); cStatus.innerHTML = "🟢 Nuvem Ativa"; cStatus.classList.remove('text-slate-500', 'text-rose-500'); cStatus.classList.add('text-emerald-600');
                 window.finalizarCarregamento();
             } catch (e) { window.fallBackLocal(); }
         }
 
         window.saveToCloud = async function() {
+            // Backup Duplo (Nuvem + PC local)
             localStorage.setItem('progestao_db_backup_' + window.state.currentUser, JSON.stringify({ projetos: window.PROJETOS_DB, clientes: window.CLIENTES_DB }));
-            if(!db) return;
+            if(!db || !userId) return;
+            
             const statusEl = document.getElementById('cloud-status'); statusEl.innerHTML = "⏳ Salvando..."; statusEl.classList.replace('text-emerald-600', 'text-amber-500');
             try { 
-                const docRef = doc(db, 'progestao_dados', "usuario_" + window.state.currentUser); 
+                const docRef = doc(db, 'progestao_dados', userId); 
                 await setDoc(docRef, { projetos: window.PROJETOS_DB, clientes: window.CLIENTES_DB }); 
                 setTimeout(() => { statusEl.innerHTML = "🟢 Salvo"; statusEl.classList.replace('text-amber-500', 'text-emerald-600'); }, 500); 
             } catch(e) { statusEl.innerHTML = "🔴 Erro Save"; }
@@ -499,10 +535,16 @@
 
         window.finalizarCarregamento = function() { 
             document.getElementById('loader-overlay').classList.add('hidden'); 
-            document.getElementById('app-container').classList.remove('hidden'); 
-            window.carregarListasBase(); window.navGlobal('portfolio'); 
+            const app = document.getElementById('app-container');
+            app.classList.remove('hidden');
+            app.classList.add('flex', 'flex-row'); // Correção definitiva do CSS de Empilhamento
+            window.carregarListasBase(); 
+            window.navGlobal('portfolio'); 
         }
 
+        // ==========================================
+        // CÁLCULOS E GRÁFICOS (Curva S, Gantt, etc)
+        // ==========================================
         const formatarData = (isoDate) => { if(!isoDate) return '-'; const [y,m,d] = isoDate.split('-'); return `${d}/${m}/${y}`; };
         const difDias = (d1, d2) => Math.round((d2.getTime() - d1.getTime()) / (1000*60*60*24));
 
@@ -583,6 +625,9 @@
             }
         }
 
+        // ==========================================
+        // RENDERIZAÇÃO DE INTERFACE
+        // ==========================================
         window.carregarListasBase = function() {
             const optData = { year: 'numeric', month: '2-digit', day: '2-digit' }; document.getElementById('current-date-display').textContent = window.state.hoje.toLocaleDateString('pt-BR', optData);
             document.getElementById('header-project-list').innerHTML = window.PROJETOS_DB.length === 0 ? '<option disabled>Nenhum projeto ativo</option>' : window.PROJETOS_DB.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
@@ -719,7 +764,7 @@
             const tbody = document.getElementById('cronograma-table-body'); const thAcomp = document.getElementById('th-acompanhamento');
             if(!p.tarefas.length && (!p.frentes || !p.frentes.length)) { 
                 tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-slate-500"><span class="text-2xl block mb-2">📅</span>Nenhuma tarefa ou frente cadastrada.</td></tr>`; 
-                if(thAcomp) thAcomp.innerHTML = '<div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Acompanhamento Visual (Timeline)</div>'; return; 
+                if(thAcomp) thAcomp.innerHTML = '<div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Acompanhamento Visual</div>'; return; 
             }
 
             const hojeLocal = new Date(window.state.hoje.toISOString().split('T')[0]+"T12:00:00");
@@ -754,7 +799,9 @@
 
         window.updProg = function(taskId, val) { let num = parseInt(val); if(isNaN(num)||num<0) num=0; if(num>100) num=100; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const t = p.tarefas.find(x => x.id === taskId); if(t) { t.progresso = num; window.renderCronogramaFrentes(p); window.saveToCloud(); } }
 
-        // FORMULÁRIOS E MODAIS
+        // =========================================================
+        // GESTÃO DE MODAIS E FORMULÁRIOS
+        // =========================================================
         window.fecharModal = (id) => document.getElementById(id).classList.add('hidden');
         
         window.abrirModalProjeto = () => { if(window.CLIENTES_DB.length === 0) { alert("Cadastre um Cliente primeiro na aba Clientes."); return; } document.getElementById('modal-projeto').classList.remove('hidden'); document.getElementById('form-projeto').reset(); document.getElementById('np-id').value = ""; document.getElementById('modal-projeto-titulo').textContent = "Criar Novo Projeto"; document.getElementById('btn-salvar-projeto').textContent = "Criar Projeto"; }
