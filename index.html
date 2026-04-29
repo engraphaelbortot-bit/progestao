@@ -31,11 +31,6 @@
 
         .frente-row { background-color: #f8fafc; border-top: 2px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background-color 0.2s; }
         .frente-row:hover { background-color: #f1f5f9; }
-        .track-bar-container { position: relative; width: 100%; height: 20px; background-color: #e2e8f0; border-radius: 999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
-        .track-bar-container.frente { height: 16px; border-radius: 6px; background-color: #cbd5e1; overflow: visible; }
-        .track-bar-progress { position: absolute; top: 0; left: 0; height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; }
-        .track-bar-progress.frente { background-color: #475569; border-radius: 6px; }
-        .track-bar-text { color: white; font-size: 0.65rem; font-weight: 700; text-shadow: 0 1px 1px rgba(0,0,0,0.4); }
 
         .bg-concluido { background-color: #10b981 !important; }
         .bg-andamento { background-color: #3b82f6 !important; }
@@ -58,7 +53,7 @@
         .filter-pill:hover:not(.active) { background-color: #f1f5f9; border-color: #cbd5e1; }
 
         /* ======================================================= */
-        /* CSS DE IMPRESSÃO (Resolve o problema do PDF cortado)    */
+        /* CSS DE IMPRESSÃO (Força cores de barras e libera páginas)*/
         /* ======================================================= */
         @media print {
             aside, header, #login-screen, #loader-overlay, .btn-excel, .no-print, .modal-overlay, #sidebar-project-menu, button { display: none !important; }
@@ -71,7 +66,10 @@
             table { page-break-inside: auto; width: 100% !important; border-collapse: collapse !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
             thead { display: table-header-group; }
+            
+            /* Força suprema do Webkit para renderização do background em Impressão de PDF */
             * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
+            
             @page { margin: 1cm; size: landscape; }
         }
     </style>
@@ -107,11 +105,11 @@
     <div id="loader-overlay" class="absolute inset-0 bg-slate-900 z-[200] flex flex-col items-center justify-center text-white transition-opacity duration-500 hidden">
         <div class="text-6xl mb-4 animate-bounce">☁️</div>
         <h2 class="text-2xl font-bold mb-2">Iniciando ProGestão</h2>
-        <p class="text-slate-400 text-sm">Verificando segurança e carregando dados...</p>
+        <p class="text-slate-400 text-sm">Conectando ao banco de dados seguro...</p>
     </div>
 
     <!-- CONTAINER DA APLICAÇÃO -->
-    <div id="app-container" class="hidden h-screen w-full overflow-hidden relative">
+    <div id="app-container" class="hidden h-screen w-full relative">
         <aside class="w-20 lg:w-64 bg-white border-r border-slate-200 flex flex-col z-20 flex-shrink-0 transition-all duration-300">
             <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-200">
                 <span class="text-3xl font-bold text-blue-600">≡</span>
@@ -224,7 +222,7 @@
                             <div class="overflow-x-auto rounded-lg border border-slate-200">
                                 <table class="min-w-full text-sm" style="border-collapse: collapse;">
                                     <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
-                                        <tr><th class="px-6 py-4 text-left w-64">Nome do Projeto</th><th class="px-4 py-4 text-left w-40">Início - Término</th><th class="px-2 py-4 text-center w-20">% Real</th><th class="px-4 py-4 text-center w-28">Status Global</th><th id="th-global-timeline" class="p-0 relative text-left min-w-[500px] border-l border-r border-slate-200 align-middle"><div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline (Meses)</div></th></tr>
+                                        <tr><th class="px-6 py-4 text-left w-64">Nome do Projeto</th><th class="px-4 py-4 text-left w-40">Início - Término</th><th class="px-2 py-4 text-center w-20">% Real</th><th class="px-4 py-4 text-center w-28 whitespace-nowrap">Status Global</th><th id="th-global-timeline" class="p-0 relative text-left min-w-[500px] border-l border-r border-slate-200 align-middle"><div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline (Meses)</div></th></tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100 bg-white" id="global-timeline-body"></tbody>
                                 </table>
@@ -251,7 +249,7 @@
                 <section id="view-proj-dashboard" class="hidden animate-fade-in w-full max-w-7xl mx-auto">
                     <div class="mb-8 flex flex-col md:flex-row justify-between md:items-end">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight" id="dash-proj-name">Nome do Projeto</h1><p class="text-slate-500 text-sm mt-1">Resumo Executivo e acompanhamento de equipe.</p></div>
-                        <div class="mt-4 md:mt-0"><span id="dash-proj-status-badge" class="px-5 py-1.5 rounded-full text-sm font-black uppercase tracking-wide shadow-sm border">Status</span></div>
+                        <div class="mt-4 md:mt-0"><span id="dash-proj-status-badge" class="px-5 py-1.5 rounded-full text-sm font-black uppercase tracking-wide shadow-sm border whitespace-nowrap">Status</span></div>
                     </div>
                     
                     <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
@@ -286,7 +284,6 @@
                         <div class="px-6 py-4 bg-white border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
                             <div class="flex items-center space-x-4">
                                 <div class="flex items-center"><span class="w-3 h-3 bg-ef4444 rounded-full mr-2" style="background-color: #ef4444;"></span><span class="text-xs font-bold text-slate-600 uppercase">Linha Vermelha = Data de Hoje</span></div>
-                                <div class="flex items-center"><span class="w-3 h-3 bg-slate-400 rounded-sm mr-2"></span><span class="text-xs font-bold text-slate-600 uppercase">Barra Cinza = Resumo da Frente</span></div>
                             </div>
                             <span class="text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1.5 rounded border border-slate-200 shadow-inner no-print">Dica: Altere o % para atualizar o status e a barra visual</span>
                         </div>
@@ -298,7 +295,7 @@
                                         <th class="px-4 py-4 text-left w-32">Responsável</th>
                                         <th class="px-4 py-4 text-left w-40">Início - Término</th>
                                         <th class="px-2 py-4 text-center w-20">% Prog.</th>
-                                        <th class="px-4 py-4 text-center w-28">Status</th>
+                                        <th class="px-4 py-4 text-center w-28 whitespace-nowrap">Status</th>
                                         <th id="th-acompanhamento" class="p-0 relative text-left min-w-[500px] border-l border-r border-slate-200 align-middle"><div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Acompanhamento Visual</div></th>
                                         <th class="px-4 py-4 text-center w-24 no-print">Ações</th>
                                     </tr>
@@ -389,7 +386,15 @@
     <div id="modal-tarefa" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
         <form id="form-tarefa" class="bg-white rounded-xl shadow-2xl w-full max-w-xl border border-slate-200 animate-fade-in" onsubmit="event.preventDefault(); window.salvarTarefa();">
             <div class="flex justify-between items-center p-6 border-b border-slate-100 bg-slate-50"><h2 class="text-xl font-black text-slate-800" id="modal-tarefa-titulo">Nova Tarefa</h2><button type="button" onclick="window.fecharModal('modal-tarefa')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
-            <div class="p-6 space-y-5"><input type="hidden" id="nt-id" value=""><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Vincular a uma Frente *</label><select id="nt-frente" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none bg-white shadow-sm"></select></div><div class="grid grid-cols-4 gap-4"><div class="col-span-1"><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">EDT</label><input type="text" id="nt-edt" class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="1.1"></div><div class="col-span-3"><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Nome da Tarefa *</label><input type="text" id="nt-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Responsável (Atribuição) *</label><select id="nt-resp" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none bg-white shadow-sm"></select></div><div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4"><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Início *</label><input type="date" id="nt-inicio" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Término *</label><input type="date" id="nt-fim" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></div></div>
+            <div class="p-6 space-y-5">
+                <input type="hidden" id="nt-id" value="">
+                <div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Vincular a uma Frente *</label><select id="nt-frente" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none bg-white shadow-sm"></select></div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Nome da Tarefa *</label><input type="text" id="nt-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Responsável (Atribuição) *</label><select id="nt-resp" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none bg-white shadow-sm"></select></div>
+                <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4"><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Início *</label><input type="date" id="nt-inicio" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Término *</label><input type="date" id="nt-fim" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm"></div></div>
+            </div>
             <div class="p-6 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button type="button" onclick="window.fecharModal('modal-tarefa')" class="px-5 py-2.5 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button type="submit" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 shadow-md transition-colors">💾 Salvar Tarefa</button></div>
         </form>
     </div>
@@ -449,16 +454,14 @@
 
             if (auth) {
                 try {
-                    // CONFIGURA A SESSÃO PARA SOBREVIVER AO F5, MAS EXPIRAR AO FECHAR A GUIA/NAVEGADOR
                     await setPersistence(auth, browserSessionPersistence);
-                    
                     if (isCreatingAccount) {
                         await createUserWithEmailAndPassword(auth, emailFormatado, p);
                         alert("Conta criada com sucesso!");
                     } else {
                         await signInWithEmailAndPassword(auth, emailFormatado, p);
                     }
-                    // O onAuthStateChanged vai capturar e liberar a entrada
+                    sessionStorage.setItem('progestao_session', 'active');
                 } catch (error) {
                     if(error.code === 'auth/email-already-in-use') { alert("Este usuário já existe! Clique em 'Voltar ao Login' para entrar."); }
                     else if(error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') { alert("Atenção: Usuário ou senha incorretos."); }
@@ -497,22 +500,16 @@
         if(auth) {
             onAuthStateChanged(auth, async (user) => { 
                 if (user) { 
-                    userId = user.uid; 
-                    window.state.currentUser = user.email.split('@')[0];
-                    document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
-                    document.getElementById('login-screen').classList.add('hidden'); 
-                    document.getElementById('loader-overlay').classList.remove('hidden');
-                    await window.loadFromCloud(); 
-                } else {
-                    let localUser = sessionStorage.getItem('progestao_local_user');
-                    if (localUser) {
-                        window.iniciarSessaoLocal(localUser);
+                    if(sessionStorage.getItem('progestao_session') === 'active') {
+                        userId = user.uid; 
+                        window.state.currentUser = user.email.split('@')[0];
+                        document.getElementById('sidebar-user-name').textContent = window.state.currentUser;
+                        document.getElementById('login-screen').classList.add('hidden'); document.getElementById('loader-overlay').classList.remove('hidden');
+                        await window.loadFromCloud(); 
                     } else {
-                        document.getElementById('app-container').classList.add('hidden');
-                        document.getElementById('login-screen').classList.remove('hidden');
-                        document.getElementById('loader-overlay').classList.add('hidden');
+                        auth.signOut();
                     }
-                }
+                } 
             }); 
         } else {
             window.addEventListener('DOMContentLoaded', () => {
@@ -526,15 +523,41 @@
             if(confirm("Deseja sair do sistema?")) {
                 if(auth) auth.signOut();
                 sessionStorage.removeItem('progestao_local_user');
+                sessionStorage.removeItem('progestao_session');
                 window.state.currentUser = null; 
                 const app = document.getElementById('app-container');
-                app.classList.remove('flex'); 
+                app.classList.remove('flex', 'flex-row'); 
                 app.classList.add('hidden'); 
                 document.getElementById('login-screen').classList.remove('hidden'); 
                 document.getElementById('form-login').reset();
                 if(isCreatingAccount) window.alternarCriarConta();
             }
         }
+
+        // ==========================================
+        // AUTO-EDT (Inteligência de Numeração)
+        // ==========================================
+        window.atualizarEDTsGlobais = function() {
+            window.PROJETOS_DB.forEach(p => window.atualizarEDTs(p));
+        };
+
+        window.atualizarEDTs = function(p) {
+            if (!p.tarefas) return;
+            let fIndex = 1;
+            (p.frentes || []).forEach(nomeFrente => {
+                let tarefasFrente = p.tarefas.filter(t => t.frente === nomeFrente);
+                tarefasFrente.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+                let tIndex = 1;
+                tarefasFrente.forEach(t => { t.edt = `${fIndex}.${tIndex}`; tIndex++; });
+                fIndex++;
+            });
+            let tarefasSemFrente = p.tarefas.filter(t => !(p.frentes || []).includes(t.frente));
+            if (tarefasSemFrente.length > 0) {
+                tarefasSemFrente.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+                let tIndex = 1;
+                tarefasSemFrente.forEach(t => { t.edt = `${fIndex}.${tIndex}`; tIndex++; });
+            }
+        };
 
         window.loadFromCloud = async function() {
             try {
@@ -549,14 +572,18 @@
                     window.PROJETOS_DB = localBackup.projetos || []; window.CLIENTES_DB = localBackup.clientes || []; 
                     await window.saveToCloud(); 
                 }
+                
+                window.atualizarEDTsGlobais();
                 const cStatus = document.getElementById('cloud-status'); cStatus.innerHTML = "🟢 Nuvem Ativa"; cStatus.classList.remove('text-slate-500', 'text-rose-500'); cStatus.classList.add('text-emerald-600');
                 window.finalizarCarregamento();
             } catch (e) { window.fallBackLocal(); }
         }
 
         window.saveToCloud = async function() {
+            window.atualizarEDTsGlobais();
             localStorage.setItem('progestao_db_backup_' + window.state.currentUser, JSON.stringify({ projetos: window.PROJETOS_DB, clientes: window.CLIENTES_DB }));
             if(!db || !userId) return;
+            
             const statusEl = document.getElementById('cloud-status'); statusEl.innerHTML = "⏳ Salvando..."; statusEl.classList.replace('text-emerald-600', 'text-amber-500');
             try { 
                 const docRef = doc(db, 'progestao_dados', userId); 
@@ -567,6 +594,7 @@
 
         window.fallBackLocal = function() {
             const localBackup = JSON.parse(localStorage.getItem('progestao_db_backup_' + window.state.currentUser) || '{}'); window.PROJETOS_DB = localBackup.projetos || []; window.CLIENTES_DB = localBackup.clientes || [];
+            window.atualizarEDTsGlobais();
             const cStatus = document.getElementById('cloud-status'); cStatus.innerHTML = "🔴 Salvo no PC"; cStatus.classList.remove('text-slate-500', 'text-emerald-600', 'text-amber-500'); cStatus.classList.add('text-rose-500');
             window.finalizarCarregamento();
         }
@@ -575,7 +603,7 @@
             document.getElementById('loader-overlay').classList.add('hidden'); 
             const app = document.getElementById('app-container');
             app.classList.remove('hidden');
-            app.classList.add('flex'); 
+            app.classList.add('flex', 'flex-row'); 
             window.carregarListasBase(); 
             window.navGlobal('portfolio'); 
         }
@@ -699,7 +727,7 @@
                 if(window.PROJETOS_DB.length === 0) { grid.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center p-16 text-slate-500 bg-white rounded-xl border border-dashed border-slate-300"><span class="text-6xl mb-4">📁</span><p class="text-xl font-bold text-slate-700">Nenhum projeto encontrado.</p></div>`; return; }
                 window.PROJETOS_DB.forEach(p => {
                     const s = analiseProjeto(p); const cli = window.CLIENTES_DB.find(c=>c.id==p.clienteId)?.nome||'Cliente Não Informado';
-                    grid.innerHTML += `<div class="glass-card p-6 cursor-pointer border-t-4 border-t-${s.color}-500 hover:-translate-y-1 transition-transform flex flex-col justify-between" onclick="document.getElementById('project-selector').value='${p.id}'; window.mudarContexto('${p.id}');"><div><div class="flex justify-between items-start mb-2"><h3 class="font-black text-slate-800 text-lg pr-2 leading-tight">${p.nome}</h3><div class="flex items-center space-x-2 flex-shrink-0"><button onclick="window.duplicarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-indigo-600 transition-colors" title="Duplicar Projeto">📑</button><button onclick="window.editarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-blue-600 transition-colors" title="Editar Projeto">✏️</button><button onclick="window.deletarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-rose-600 transition-colors" title="Excluir Projeto">🗑️</button></div></div><div class="mb-4 inline-block"><span class="px-2 py-1 bg-${s.color}-100 text-${s.color}-700 text-[10px] font-bold rounded uppercase tracking-wider">${s.badge}</span></div><p class="text-xs font-semibold text-slate-500 mb-4">${cli} • ${p.area || 'Geral'}</p></div><div><div class="flex justify-between text-xs font-bold mb-1"><span class="text-slate-500">Avanço Físico</span><span class="text-blue-600">${s.avanco}%</span></div><div class="w-full bg-slate-100 rounded-full h-2.5 mb-4"><div class="bg-blue-600 h-2.5 rounded-full" style="width: ${s.avanco}%"></div></div><div class="text-xs font-semibold text-slate-500 border-t border-slate-100 pt-3 flex justify-between"><span>Início: ${formatarData(p.inicio)}</span>${s.atr>0 ? `<span class="text-rose-600">🔴 ${s.atr} atrasos</span>` : `<span class="text-emerald-600">✅ Em dia</span>`}</div></div></div>`;
+                    grid.innerHTML += `<div class="glass-card p-6 cursor-pointer border-t-4 border-t-${s.color}-500 hover:-translate-y-1 transition-transform flex flex-col justify-between" onclick="document.getElementById('project-selector').value='${p.id}'; window.mudarContexto('${p.id}');"><div><div class="flex justify-between items-start mb-2"><h3 class="font-black text-slate-800 text-lg pr-2 leading-tight">${p.nome}</h3><div class="flex items-center space-x-2 flex-shrink-0"><button onclick="window.duplicarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-indigo-600 transition-colors" title="Duplicar Projeto">📑</button><button onclick="window.editarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-blue-600 transition-colors" title="Editar Projeto">✏️</button><button onclick="window.deletarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-rose-600 transition-colors" title="Excluir">🗑️</button></div></div><div class="mb-4 inline-block"><span class="px-2 py-1 bg-${s.color}-100 text-${s.color}-700 text-[10px] font-bold rounded uppercase tracking-wider">${s.badge}</span></div><p class="text-xs font-semibold text-slate-500 mb-4">${cli} • ${p.area || 'Geral'}</p></div><div><div class="flex justify-between text-xs font-bold mb-1"><span class="text-slate-500">Avanço Físico</span><span class="text-blue-600">${s.avanco}%</span></div><div class="w-full bg-slate-100 rounded-full h-2.5 mb-4"><div class="bg-blue-600 h-2.5 rounded-full" style="width: ${s.avanco}%"></div></div><div class="text-xs font-semibold text-slate-500 border-t border-slate-100 pt-3 flex justify-between"><span>Início: ${formatarData(p.inicio)}</span>${s.atr>0 ? `<span class="text-rose-600">🔴 ${s.atr} atrasos</span>` : `<span class="text-emerald-600">✅ Em dia</span>`}</div></div></div>`;
                 });
             } else if(window.state.currentView === 'clientes') {
                 const tbody = document.getElementById('clientes-table-body');
@@ -726,7 +754,7 @@
                             if(st==='Concluída') workload[mIdKey].conc++; else if(st==='Atrasada') workload[mIdKey].atr++; else workload[mIdKey].ativas++;
                             if(!hConsultor[uName]) hConsultor[uName] = {nome: uName, saude:0, count:0}; hConsultor[uName].saude += Number(t.progresso); hConsultor[uName].count++;
                         });
-                        projRows += `<tr class="hover:bg-slate-50 border-b border-slate-50"><td class="py-3 px-4 font-bold text-slate-800">${p.nome}</td><td class="py-3 px-4 text-slate-600">${cliName}</td><td class="py-3 px-4 text-slate-600">${p.area||'-'}</td><td class="py-3 px-4 text-center"><span class="bg-${s.color}-100 text-${s.color}-700 px-2 py-1 rounded text-[10px] font-bold">${s.badge}</span></td><td class="py-3 px-4 text-center font-bold text-rose-500">${s.atr}</td><td class="py-3 px-4 text-center font-bold text-blue-600">${s.avanco}%</td><td class="py-3 px-4 text-slate-600">${formatarData(p.fim)}</td></tr>`;
+                        projRows += `<tr class="hover:bg-slate-50 transition-colors"><td class="py-3 px-4 font-bold text-slate-800">${p.nome}</td><td class="py-3 px-4 text-slate-600">${cliName}</td><td class="py-3 px-4 text-slate-600">${p.area||'-'}</td><td class="py-3 px-4 text-center whitespace-nowrap"><span class="bg-${s.color}-100 text-${s.color}-700 px-2 py-1 rounded text-[10px] font-bold">${s.badge}</span></td><td class="py-3 px-4 text-center font-bold text-rose-500">${s.atr}</td><td class="py-3 px-4 text-center font-bold text-blue-600">${s.avanco}%</td><td class="py-3 px-4 text-slate-600">${formatarData(p.fim)}</td></tr>`;
                     });
                     
                     const wlBody = Object.values(workload).filter(w=>w.total>0);
@@ -750,7 +778,8 @@
                         if(thGlobTl) thGlobTl.innerHTML = `<div class="relative w-full h-full pt-8 pb-2">${gerarMesesHeader(gIni, gFim, totalGlobDias)}${hPercGlob >= 0 ? `<div class="absolute top-6 bottom-0 w-[2px] bg-red-500 z-40 shadow-[0_0_5px_rgba(239,68,68,0.5)]" style="left: ${hPercGlob}%;"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-md tracking-wider">HOJE</span></div>` : ''}</div>`;
                         tlBody.innerHTML = projsSel.sort((a,b)=>new Date(a.inicio)-new Date(b.inicio)).map(p => {
                             const s = analiseProjeto(p); const pLeft = (difDias(gIni, new Date(p.inicio+"T12:00:00")) / totalGlobDias) * 100; const pWidth = Math.max((difDias(new Date(p.inicio+"T12:00:00"), new Date(p.fim+"T12:00:00")) / totalGlobDias) * 100, 0.5);
-                            return `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-4 font-black text-slate-800 text-xs">${p.nome}</td><td class="px-4 py-4 text-[10px] font-bold text-slate-600">${formatarData(p.inicio)} - ${formatarData(p.fim)}</td><td class="px-2 py-4 text-center font-black text-blue-700 text-sm">${s.avanco}%</td><td class="px-4 py-4 text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(s.badge,'text')} shadow-sm">${s.badge}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGlob >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGlob}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-2 bottom-2 rounded-md shadow-sm ${classColor(s.badge,'bg')} z-10 overflow-hidden" style="left: ${pLeft}%; width: ${pWidth}%;"><div class="h-full bg-black/20" style="width: ${s.avanco}%;"></div></div>${s.avanco > 10 ? `<span class="absolute top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-700 z-30 drop-shadow-md" style="left: calc(${pLeft} + ${pWidth}% + 4px);">${s.avanco}%</span>` : ''}</div></td></tr>`;
+                            let hexT = '#94a3b8'; if(s.badge === 'No Prazo') hexT = '#10b981'; else if(s.badge === 'Atrasado') hexT = '#ef4444'; else if(s.badge === 'Em Risco') hexT = '#f59e0b';
+                            return `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-4 font-black text-slate-800 text-xs">${p.nome}</td><td class="px-4 py-4 text-[10px] font-bold text-slate-600">${formatarData(p.inicio)} - ${formatarData(p.fim)}</td><td class="px-2 py-4 text-center font-black text-blue-700 text-sm">${s.avanco}%</td><td class="px-4 py-4 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(s.badge,'text')} shadow-sm">${s.badge}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGlob >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGlob}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-[8px] bottom-[8px] rounded-md shadow-sm overflow-hidden" style="left: ${pLeft}%; width: ${pWidth}%; background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full" style="width: ${s.avanco}%; background-color: ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${s.avanco > 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: calc(${pLeft + pWidth}% + 6px);"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded shadow-sm whitespace-nowrap">${s.avanco}%</span></div>` : ''}</div></td></tr>`;
                         }).join('');
                     }
                 }
@@ -777,7 +806,7 @@
 
             if(window.state.currentView === 'dashboard') {
                 document.getElementById('dash-proj-name').textContent = p.nome;
-                const b = document.getElementById('dash-proj-status-badge'); b.textContent = s.badge; b.className = `px-4 py-1.5 rounded-full text-sm font-black uppercase bg-${s.color}-100 text-${s.color}-800 shadow-sm border border-${s.color}-200`;
+                const b = document.getElementById('dash-proj-status-badge'); b.textContent = s.badge; b.className = `px-4 py-1.5 rounded-full text-sm font-black uppercase bg-${s.color}-100 text-${s.color}-800 shadow-sm border border-${s.color}-200 whitespace-nowrap`;
                 document.getElementById('dash-progresso').textContent = s.avanco; document.getElementById('dash-concluidas').textContent = s.conc; document.getElementById('dash-atrasadas').textContent = s.atr; document.getElementById('dash-total').textContent = s.total;
                 document.getElementById('dash-tplanejado').textContent = s.tPlanejado; document.getElementById('dash-desvio').textContent = s.desvioMedio;
 
@@ -826,8 +855,13 @@
 
             if(thAcomp) thAcomp.innerHTML = `<div class="relative w-full h-full pt-8 pb-2">${gerarMesesHeader(projIni, projFim, totalProjDias)}${hPercGeral >= 0 ? `<div class="absolute top-6 bottom-0 w-[2px] bg-red-500 z-40 shadow-[0_0_5px_rgba(239,68,68,0.5)]" style="left: ${hPercGeral}%;"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-md tracking-wider">HOJE</span></div>` : ''}</div>`;
 
-            const frentesDict = {}; (p.frentes||[]).forEach(f => frentesDict[f] = { nome: f, tarefas: [], tProg: 0, dMin: null, dMax: null });
-            p.tarefas.forEach(t => { const fname = t.frente || 'GERAL'; if(!frentesDict[fname]) frentesDict[fname] = { nome: fname, tarefas: [], tProg: 0, dMin: null, dMax: null }; frentesDict[fname].tarefas.push(t); frentesDict[fname].tProg += Number(t.progresso); const dIni = new Date(t.inicio+"T12:00:00"), dFim = new Date(t.fim+"T12:00:00"); if(!frentesDict[fname].dMin || dIni < frentesDict[fname].dMin) frentesDict[fname].dMin = dIni; if(!frentesDict[fname].dMax || dFim > frentesDict[fname].dMax) frentesDict[fname].dMax = dFim; });
+            const frentesDict = {}; (p.frentes||[]).forEach(f => frentesDict[f] = { nome: f, tarefas: [], tProg: 0, dMin: null, dMax: null, statuses: [] });
+            p.tarefas.forEach(t => { 
+                const fname = t.frente || 'GERAL'; if(!frentesDict[fname]) frentesDict[fname] = { nome: fname, tarefas: [], tProg: 0, dMin: null, dMax: null, statuses: [] }; 
+                frentesDict[fname].tarefas.push(t); frentesDict[fname].tProg += Number(t.progresso); 
+                frentesDict[fname].statuses.push(statusDaTarefa(t.inicio, t.fim, t.progresso));
+                const dIni = new Date(t.inicio+"T12:00:00"), dFim = new Date(t.fim+"T12:00:00"); if(!frentesDict[fname].dMin || dIni < frentesDict[fname].dMin) frentesDict[fname].dMin = dIni; if(!frentesDict[fname].dMax || dFim > frentesDict[fname].dMax) frentesDict[fname].dMax = dFim; 
+            });
 
             let html = '';
             Object.values(frentesDict).forEach(f => {
@@ -836,12 +870,22 @@
                 if(f.dMin && f.dMax) { dataText = `${formatarData(f.dMin.toISOString().split('T')[0])} até ${formatarData(f.dMax.toISOString().split('T')[0])}`; fLeft = (difDias(projIni, f.dMin) / totalProjDias) * 100; fWidth = Math.max((difDias(f.dMin, f.dMax) / totalProjDias) * 100, 0.5); }
                 const safeFrenteId = `frente-${f.nome.replace(/\W/g, '')}`;
 
-                html += `<tr class="frente-row" onclick="window.toggleFrente('${safeFrenteId}')"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider select-none"><span id="icon-${safeFrenteId}" class="inline-block transition-transform duration-200 mr-1 text-slate-400 no-print">▼</span> ◪ ${f.nome}</td><td class="px-4 py-3 text-[10px] font-bold text-slate-600 select-none">${dataText}</td><td class="px-2 py-3 text-center font-black text-blue-700 text-sm select-none">${avg}%</td><td class="px-4 py-3"></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle select-none">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-3 w-full h-full relative">${f.dMin ? `<div class="absolute top-4 bottom-4 rounded-md bg-slate-400 z-10 shadow-sm" style="left: ${fLeft}%; width: ${fWidth}%;"></div>` : ''}</div></td><td class="px-4 py-3 text-right no-print"><button onclick="window.abrirEditarFrente('${f.nome}'); event.stopPropagation();" class="text-blue-500 hover:text-blue-700 transition-colors text-lg mr-2" title="Editar Frente">✏️</button><button onclick="window.deletarFrente('${f.nome}'); event.stopPropagation();" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Excluir Frente">🗑️</button></td></tr>`;
+                let hasAtrasada = f.statuses.includes('Atrasada');
+                let hasAndamento = f.statuses.includes('Em Andamento');
+                let allConcluida = f.tarefas.length > 0 && f.statuses.every(s => s === 'Concluída');
+                let hexBg = '#94a3b8'; // Cinza 
+                if(hasAtrasada) hexBg = '#ef4444'; // Vermelho
+                else if(hasAndamento || (f.statuses.includes('Concluída') && !allConcluida)) hexBg = '#3b82f6'; // Azul
+                else if(allConcluida) hexBg = '#10b981'; // Verde
+
+                html += `<tr class="frente-row" onclick="window.toggleFrente('${safeFrenteId}')"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider select-none"><span id="icon-${safeFrenteId}" class="inline-block transition-transform duration-200 mr-1 text-slate-400 no-print">▼</span> ◪ ${f.nome}</td><td class="px-4 py-3 text-[10px] font-bold text-slate-600 select-none whitespace-nowrap">${dataText}</td><td class="px-2 py-3 text-center font-black text-blue-700 text-sm select-none">${avg}%</td><td class="px-4 py-3"></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle select-none">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-3 w-full h-full relative">${f.dMin ? `<div class="absolute top-1/2 -translate-y-1/2 rounded-md shadow-md overflow-hidden" style="left: ${fLeft}%; width: ${fWidth}%; height: 20px; border: 1px solid #cbd5e1; background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full" style="width: ${avg}%; background-color: ${hexBg} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${avg >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: calc(${fLeft + fWidth}% + 6px);"><span class="text-[11px] font-black text-slate-800 bg-white/90 px-1 rounded shadow-sm whitespace-nowrap">${avg}%</span></div>` : ''}` : ''}</div></td><td class="px-4 py-3 text-right no-print"><button onclick="window.abrirEditarFrente('${f.nome}'); event.stopPropagation();" class="text-blue-500 hover:text-blue-700 transition-colors text-lg mr-2" title="Editar Frente">✏️</button><button onclick="window.deletarFrente('${f.nome}'); event.stopPropagation();" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Excluir Frente">🗑️</button></td></tr>`;
                 
                 f.tarefas.sort((a,b)=>new Date(a.inicio)-new Date(b.inicio)).forEach(t => {
                     const resp = p.equipe?.find(u=>u.id==t.respId)?.nome||'Não Atribuído'; const st = statusDaTarefa(t.inicio, t.fim, t.progresso);
                     let tLeft = (difDias(projIni, new Date(t.inicio+"T12:00:00")) / totalProjDias) * 100; let tWidth = Math.max((difDias(new Date(t.inicio+"T12:00:00"), new Date(t.fim+"T12:00:00")) / totalProjDias) * 100, 0.5);
-                    html += `<tr class="hover:bg-slate-50 transition-colors task-of-${safeFrenteId}"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="window.editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="window.updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-2 bottom-2 rounded-md shadow-sm ${classColor(st,'bg')} z-10 overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%;"><div class="h-full bg-black/20" style="width: ${t.progresso}%;"></div></div>${t.progresso > 10 ? `<span class="absolute top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-700 z-30 drop-shadow-md" style="left: calc(${tLeft} + ${tWidth}% + 4px);">${t.progresso}%</span>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap no-print"><button onclick="window.editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="window.deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
+                    let hexT = '#94a3b8'; if(st === 'Concluída') hexT = '#10b981'; else if(st === 'Atrasada') hexT = '#ef4444'; else if(st === 'Em Andamento') hexT = '#3b82f6';
+
+                    html += `<tr class="hover:bg-slate-50 transition-colors task-of-${safeFrenteId}"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="window.editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium whitespace-nowrap"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="window.updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-1/2 -translate-y-1/2 rounded-sm shadow-sm overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%; height: 14px; background-color: #e2e8f0 !important; border: 1px solid #cbd5e1; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full" style="width: ${t.progresso}%; background-color: ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${t.progresso >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: calc(${tLeft + tWidth}% + 4px);"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded whitespace-nowrap">${t.progresso}%</span></div>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap no-print"><button onclick="window.editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="window.deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
                 });
             });
             tbody.innerHTML = html;
@@ -849,7 +893,7 @@
 
         window.updProg = function(taskId, val) { let num = parseInt(val); if(isNaN(num)||num<0) num=0; if(num>100) num=100; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const t = p.tarefas.find(x => x.id === taskId); if(t) { t.progresso = num; window.renderCronogramaFrentes(p); window.saveToCloud(); } }
 
-        // FORMULÁRIOS E MODAIS
+        // FORMULÁRIOS
         window.fecharModal = (id) => document.getElementById(id).classList.add('hidden');
         
         window.abrirModalProjeto = () => { if(window.CLIENTES_DB.length === 0) { alert("Cadastre um Cliente primeiro na aba Clientes."); return; } document.getElementById('modal-projeto').classList.remove('hidden'); document.getElementById('form-projeto').reset(); document.getElementById('np-id').value = ""; document.getElementById('modal-projeto-titulo').textContent = "Criar Novo Projeto"; document.getElementById('btn-salvar-projeto').textContent = "Criar Projeto"; }
@@ -892,9 +936,16 @@
         }
         window.editarTarefa = (id) => {
             const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const t = p.tarefas.find(x => x.id === id);
-            if(t) { document.getElementById('nt-frente').innerHTML = p.frentes.map(f => `<option value="${f}">${f}</option>`).join(''); document.getElementById('nt-resp').innerHTML = p.equipe.map(m => `<option value="${m.id}">${m.nome}</option>`).join(''); document.getElementById('modal-tarefa-titulo').textContent="Editar Tarefa"; document.getElementById('nt-id').value=t.id; document.getElementById('nt-frente').value=t.frente||""; document.getElementById('nt-edt').value=t.edt||""; document.getElementById('nt-nome').value=t.nome; document.getElementById('nt-resp').value=t.respId; document.getElementById('nt-inicio').value=t.inicio; document.getElementById('nt-fim').value=t.fim; document.getElementById('modal-tarefa').classList.remove('hidden'); }
+            if(t) { document.getElementById('nt-frente').innerHTML = p.frentes.map(f => `<option value="${f}">${f}</option>`).join(''); document.getElementById('nt-resp').innerHTML = p.equipe.map(m => `<option value="${m.id}">${m.nome}</option>`).join(''); document.getElementById('modal-tarefa-titulo').textContent="Editar Tarefa"; document.getElementById('nt-id').value=t.id; document.getElementById('nt-frente').value=t.frente||""; document.getElementById('nt-nome').value=t.nome; document.getElementById('nt-resp').value=t.respId; document.getElementById('nt-inicio').value=t.inicio; document.getElementById('nt-fim').value=t.fim; document.getElementById('modal-tarefa').classList.remove('hidden'); }
         }
-        window.salvarTarefa = () => { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const id = document.getElementById('nt-id').value, frente = document.getElementById('nt-frente').value, edt = document.getElementById('nt-edt').value, nome = document.getElementById('nt-nome').value, respId = document.getElementById('nt-resp').value, inicio = document.getElementById('nt-inicio').value, fim = document.getElementById('nt-fim').value; if(!frente || !nome || !inicio || !fim || !respId) return; if(id) { const t = p.tarefas.find(x=>x.id==id); if(t) { t.frente=frente; t.edt=edt; t.nome=nome; t.respId=respId; t.inicio=inicio; t.fim=fim; } } else { const maxId = p.tarefas.length?Math.max(...p.tarefas.map(x=>x.id))+1:1; p.tarefas.push({ id: maxId, frente, edt, nome, respId, inicio, fim, progresso: 0 }); } window.fecharModal('modal-tarefa'); window.renderProject(); window.saveToCloud(); }
+        window.salvarTarefa = () => { 
+            const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); 
+            const id = document.getElementById('nt-id').value, frente = document.getElementById('nt-frente').value, nome = document.getElementById('nt-nome').value, respId = document.getElementById('nt-resp').value, inicio = document.getElementById('nt-inicio').value, fim = document.getElementById('nt-fim').value; 
+            if(!frente || !nome || !inicio || !fim || !respId) return; 
+            if(id) { const t = p.tarefas.find(x=>x.id==id); if(t) { t.frente=frente; t.nome=nome; t.respId=respId; t.inicio=inicio; t.fim=fim; } } 
+            else { const maxId = p.tarefas.length?Math.max(...p.tarefas.map(x=>x.id))+1:1; p.tarefas.push({ id: maxId, frente, edt: '', nome, respId, inicio, fim, progresso: 0 }); } 
+            window.fecharModal('modal-tarefa'); window.saveToCloud(); window.renderProject(); 
+        }
         window.deletarTarefa = (id) => { if(confirm("Apagar esta tarefa do cronograma?")) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); p.tarefas = p.tarefas.filter(t => t.id !== id); window.renderProject(); window.saveToCloud(); } }
 
         window.adicionarMembro = function(e) { e.preventDefault(); const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const nome = document.getElementById('rec-nome').value, papel = document.getElementById('rec-papel').value; const novoId = p.equipe && p.equipe.length > 0 ? Math.max(...p.equipe.map(x=>x.id)) + 1 : 1; if(!p.equipe) p.equipe = []; p.equipe.push({ id: novoId, nome, papel }); document.getElementById('form-recurso').reset(); window.renderProject(); window.saveToCloud(); }
