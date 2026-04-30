@@ -27,7 +27,15 @@
 
         .chart-container { position: relative; width: 100%; height: 320px; margin: 0 auto; }
         .chart-container-small { position: relative; width: 100%; height: 240px; margin: 0 auto; }
-        .chart-container-horizontal { position: relative; width: 100%; height: 180px; } 
+        
+        /* Animação Suave Global (Fluidez na troca de abas) */
+        .animate-fade-in {
+            animation: fadeInFluid 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeInFluid {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .frente-row { background-color: #f8fafc; border-top: 2px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; cursor: pointer; transition: background-color 0.2s; }
         .frente-row:hover { background-color: #f1f5f9; }
@@ -44,7 +52,8 @@
         .text-naoiniciado { color: #475569; background: #f1f5f9; }
         .text-risco { color: #b45309; background: #fef3c7; }
 
-        .insight-kpi-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1.25rem; background: #fff; display: flex; flex-direction: column; justify-content: space-between; }
+        .insight-kpi-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1.25rem; background: #fff; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s ease; }
+        .insight-kpi-card:hover { transform: translateY(-3px); }
         .insight-status-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-radius: 0.5rem; margin-bottom: 0.75rem; background: #f8fafc; border: 1px solid #f1f5f9; }
 
         .btn-excel:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(16,185,129,0.2); }
@@ -57,19 +66,19 @@
         /* ======================================================= */
         @media print {
             aside, header, #login-screen, #loader-overlay, .btn-excel, .no-print, .modal-overlay, #sidebar-project-menu, button { display: none !important; }
-            body, html, #app-container, main, #main-content, .flex-1, .overflow-y-auto, .overflow-x-auto, .overflow-hidden, section.block, .glass-card {
+            body, html, #app-container, main, #main-content, .flex-1, .glass-card {
                 display: block !important; height: auto !important; min-height: auto !important; max-height: none !important;
                 overflow: visible !important; position: static !important; width: 100% !important; padding: 0 !important;
                 margin: 0 !important; box-shadow: none !important; border: none !important;
             }
+            .overflow-x-auto, .overflow-y-auto, .overflow-hidden { overflow: visible !important; }
             section.hidden { display: none !important; }
             table { page-break-inside: auto; width: 100% !important; border-collapse: collapse !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
+            td, th { page-break-inside: avoid; }
             thead { display: table-header-group; }
             
-            /* Força suprema do Webkit para renderização do background em Impressão de PDF */
             * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
-            
             @page { margin: 1cm; size: landscape; }
         }
     </style>
@@ -127,7 +136,6 @@
                     <ul class="space-y-1">
                         <li><a onclick="window.navProject('dashboard')" id="nav-proj-dashboard" class="nav-item w-full flex items-center px-0 lg:px-6 py-3 text-slate-600 justify-center lg:justify-start"><span class="text-xl lg:mr-3">📊</span> <span class="hidden lg:block font-medium">Resumo Executivo</span></a></li>
                         <li><a onclick="window.navProject('cronograma')" id="nav-proj-cronograma" class="nav-item w-full flex items-center px-0 lg:px-6 py-3 text-slate-600 justify-center lg:justify-start"><span class="text-xl lg:mr-3">📅</span> <span class="hidden lg:block font-medium">Cronograma (Frentes)</span></a></li>
-                        <li><a onclick="window.navProject('relatorio')" id="nav-proj-relatorio" class="nav-item w-full flex items-center px-0 lg:px-6 py-3 text-slate-600 justify-center lg:justify-start"><span class="text-xl lg:mr-3">📋</span> <span class="hidden lg:block font-medium">Status Report</span></a></li>
                         <li><a onclick="window.navProject('cadastros')" id="nav-proj-cadastros" class="nav-item w-full flex items-center px-0 lg:px-6 py-3 text-slate-600 justify-center lg:justify-start"><span class="text-xl lg:mr-3">⚙️</span> <span class="hidden lg:block font-medium">Equipe do Projeto</span></a></li>
                     </ul>
                 </div>
@@ -145,7 +153,7 @@
         <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
             <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10 shadow-sm no-print">
                 <div class="flex items-center relative flex-1 max-w-md">
-                    <select id="project-selector" onchange="window.mudarContexto(this.value)" class="bg-transparent text-slate-800 text-lg lg:text-xl font-black focus:ring-0 focus:outline-none cursor-pointer appearance-none w-full pr-8 z-10 relative">
+                    <select id="project-selector" onchange="window.mudarContexto(this.value)" class="bg-transparent text-slate-800 text-lg lg:text-xl font-black focus:ring-0 focus:outline-none cursor-pointer appearance-none w-full pr-8 z-10 relative transition-transform">
                         <option value="global">🏢 Portfólio Global da Empresa</option>
                         <optgroup label="Seus Projetos Ativos" id="header-project-list"></optgroup>
                     </select>
@@ -168,19 +176,19 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8" id="main-content">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 md:p-8 relative" id="main-content">
                 
                 <!-- VISÃO: PORTFÓLIO -->
                 <section id="view-portfolio" class="block animate-fade-in max-w-7xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 no-print">
-                        <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">Seus Projetos</h1><p class="text-slate-500 text-sm mt-1">Gerencie e acompanhe o progresso geral do seu portfólio.</p></div>
-                        <button onclick="window.abrirModalProjeto()" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5 no-print"><span class="mr-2 font-black text-lg">+</span> Novo Projeto</button>
+                        <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">Seus Projetos</h1><p class="text-slate-500 text-sm mt-1">Gerencie, ordene (arrastando os cartões) e acompanhe seu portfólio.</p></div>
+                        <button onclick="window.abrirModalProjeto()" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5"><span class="mr-2 font-black text-lg">+</span> Novo Projeto</button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="portfolio-grid"></div>
                 </section>
 
                 <!-- VISÃO: CLIENTES -->
-                <section id="view-clientes" class="hidden animate-fade-in max-w-7xl mx-auto">
+                <section id="view-clientes" class="hidden max-w-7xl mx-auto">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 no-print">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center">🏢 Base de Clientes</h1><p class="text-slate-500 text-sm mt-1">Cadastre clientes para vinculá-los aos seus projetos.</p></div>
                         <button onclick="window.abrirModalCliente()" class="mt-4 md:mt-0 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-6 rounded-lg shadow transition-all flex items-center transform hover:-translate-y-0.5 no-print"><span class="mr-2 font-black text-lg">+</span> Cadastrar Cliente</button>
@@ -198,7 +206,7 @@
                 </section>
 
                 <!-- VISÃO: INSIGHTS & GLOBAL -->
-                <section id="view-insights" class="hidden animate-fade-in max-w-full mx-auto">
+                <section id="view-insights" class="hidden max-w-full mx-auto">
                     <div class="mb-8"><h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center"><span class="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm mr-3">⏱</span> Insights & Macro Global</h1><p class="text-slate-500 text-sm mt-1">Visão consolidada de indicadores, curvas e linha do tempo de todos os projetos.</p></div>
                     
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
@@ -219,12 +227,18 @@
                         <div class="mb-10"><h3 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">Curva S Dinâmica (Consolidada Ponderada)</h3><div class="chart-container"><canvas id="globalCurvaSChart"></canvas></div></div>
                         <div>
                             <h3 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">Timeline Macro (Projetos Selecionados)</h3>
-                            <div class="overflow-x-auto rounded-lg border border-slate-200">
+                            <div class="overflow-x-auto rounded-lg border border-slate-200 relative">
                                 <table class="min-w-full text-sm" style="border-collapse: collapse;">
-                                    <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
-                                        <tr><th class="px-6 py-4 text-left w-64">Nome do Projeto</th><th class="px-4 py-4 text-left w-40">Início - Término</th><th class="px-2 py-4 text-center w-20">% Real</th><th class="px-4 py-4 text-center w-28 whitespace-nowrap">Status Global</th><th id="th-global-timeline" class="p-0 relative text-left min-w-[500px] border-l border-r border-slate-200 align-middle"><div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline (Meses)</div></th></tr>
+                                    <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200 relative z-50">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left w-64">Nome do Projeto</th>
+                                            <th class="px-4 py-4 text-left w-40">Início - Término</th>
+                                            <th class="px-2 py-4 text-center w-20">% Real</th>
+                                            <th class="px-4 py-4 text-center w-28 whitespace-nowrap">Status Global</th>
+                                            <th id="th-global-timeline" class="p-0 relative text-left min-w-[500px] border-l border-r border-slate-200 align-middle"><div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline (Meses)</div></th>
+                                        </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-100 bg-white" id="global-timeline-body"></tbody>
+                                    <tbody class="divide-y divide-slate-100 bg-white relative z-10" id="global-timeline-body"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -246,19 +260,19 @@
                 </section>
 
                 <!-- VISÃO: DASHBOARD DO PROJETO -->
-                <section id="view-proj-dashboard" class="hidden animate-fade-in w-full max-w-7xl mx-auto">
+                <section id="view-proj-dashboard" class="hidden max-w-7xl mx-auto">
                     <div class="mb-8 flex flex-col md:flex-row justify-between md:items-end">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight" id="dash-proj-name">Nome do Projeto</h1><p class="text-slate-500 text-sm mt-1">Resumo Executivo e acompanhamento de equipe.</p></div>
                         <div class="mt-4 md:mt-0"><span id="dash-proj-status-badge" class="px-5 py-1.5 rounded-full text-sm font-black uppercase tracking-wide shadow-sm border whitespace-nowrap">Status</span></div>
                     </div>
                     
                     <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-                        <div class="glass-card p-4 border-t-4 border-blue-500 flex flex-col justify-between"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Progresso Real</p><p class="text-3xl font-black text-blue-600"><span id="dash-progresso">0</span>%</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Avanço físico validado.</p></div>
-                        <div class="glass-card p-4 border-t-4 border-emerald-500 flex flex-col justify-between"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Concluídas</p><p class="text-3xl font-black text-emerald-600" id="dash-concluidas">0</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Tarefas 100% entregues.</p></div>
-                        <div class="glass-card p-4 border-t-4 border-rose-500 flex flex-col justify-between"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Atrasadas</p><p class="text-3xl font-black text-rose-600" id="dash-atrasadas">0</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Tarefas fora do prazo.</p></div>
-                        <div class="glass-card p-4 border-t-4 border-slate-400 flex flex-col justify-between"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">T. Tarefas</p><p class="text-3xl font-black text-slate-800" id="dash-total">0</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Atividades na obra.</p></div>
-                        <div class="glass-card p-4 border-t-4 border-cyan-500 flex flex-col justify-between"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">T. Planejado</p><p class="text-3xl font-black text-cyan-600"><span id="dash-tplanejado">0</span><span class="text-xs font-semibold ml-1">dias</span></p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Duração (Início-Fim).</p></div>
-                        <div class="glass-card p-4 border-t-4 border-amber-500 flex flex-col justify-between"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Desvio Médio</p><p class="text-3xl font-black text-amber-600"><span id="dash-desvio">0</span><span class="text-xs font-semibold ml-1">dias</span></p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Média do estouro.</p></div>
+                        <div class="glass-card p-4 border-t-4 border-blue-500 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Progresso Real</p><p class="text-3xl font-black text-blue-600"><span id="dash-progresso">0</span>%</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Avanço físico validado.</p></div>
+                        <div class="glass-card p-4 border-t-4 border-emerald-500 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Concluídas</p><p class="text-3xl font-black text-emerald-600" id="dash-concluidas">0</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Tarefas 100% entregues.</p></div>
+                        <div class="glass-card p-4 border-t-4 border-rose-500 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Atrasadas</p><p class="text-3xl font-black text-rose-600" id="dash-atrasadas">0</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Tarefas fora do prazo.</p></div>
+                        <div class="glass-card p-4 border-t-4 border-slate-400 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">T. Tarefas</p><p class="text-3xl font-black text-slate-800" id="dash-total">0</p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Atividades na obra.</p></div>
+                        <div class="glass-card p-4 border-t-4 border-cyan-500 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">T. Planejado</p><p class="text-3xl font-black text-cyan-600"><span id="dash-tplanejado">0</span><span class="text-xs font-semibold ml-1">dias</span></p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Duração (Início-Fim).</p></div>
+                        <div class="glass-card p-4 border-t-4 border-amber-500 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1"><p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Desvio Médio</p><p class="text-3xl font-black text-amber-600"><span id="dash-desvio">0</span><span class="text-xs font-semibold ml-1">dias</span></p><p class="text-[9px] text-slate-400 mt-2 leading-tight">Média do estouro.</p></div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -272,7 +286,7 @@
                 </section>
 
                 <!-- VISÃO: CRONOGRAMA & TAREFAS -->
-                <section id="view-proj-cronograma" class="hidden animate-fade-in w-full max-w-[100%] mx-auto">
+                <section id="view-proj-cronograma" class="hidden max-w-[100%] mx-auto">
                     <div class="mb-8 flex flex-col md:flex-row justify-between md:items-end">
                         <div><h1 class="text-3xl font-black text-slate-800 tracking-tight">📅 Cronograma e Frentes</h1><p class="text-slate-500 text-sm mt-1">Gerencie as macroatividades, adicione tarefas e acompanhe o avanço dinâmico na Timeline.</p></div>
                         <div class="mt-4 md:mt-0 flex space-x-3 no-print">
@@ -287,38 +301,27 @@
                             </div>
                             <span class="text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1.5 rounded border border-slate-200 shadow-inner no-print">Dica: Altere o % para atualizar o status e a barra visual</span>
                         </div>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto relative">
                             <table class="min-w-full text-sm" style="border-collapse: collapse;">
-                                <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200">
+                                <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-b border-slate-200 relative z-50">
                                     <tr>
                                         <th class="px-6 py-4 text-left w-64">EDT / Fase e Tarefa</th>
                                         <th class="px-4 py-4 text-left w-32">Responsável</th>
                                         <th class="px-4 py-4 text-left w-40">Início - Término</th>
                                         <th class="px-2 py-4 text-center w-20">% Prog.</th>
                                         <th class="px-4 py-4 text-center w-28 whitespace-nowrap">Status</th>
-                                        <th id="th-acompanhamento" class="p-0 relative text-left min-w-[500px] border-l border-r border-slate-200 align-middle"><div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Acompanhamento Visual</div></th>
+                                        <th id="th-acompanhamento" class="p-0 relative text-left border-l border-r border-slate-200 align-bottom"><div class="relative w-full min-w-[500px] h-[40px]"></div></th>
                                         <th class="px-4 py-4 text-center w-24 no-print">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 bg-white" id="cronograma-table-body"></tbody>
+                                <tbody class="divide-y divide-slate-100 bg-white relative z-10" id="cronograma-table-body"></tbody>
                             </table>
                         </div>
                     </div>
                 </section>
 
-                <!-- VISÃO: STATUS REPORT -->
-                <section id="view-proj-relatorio" class="hidden animate-fade-in w-full max-w-4xl mx-auto">
-                    <div class="mb-8"><h1 class="text-3xl font-black text-slate-800 tracking-tight">📋 Relatório de Status (Anotações)</h1><p class="text-slate-500 text-sm mt-1">Registre o parecer executivo, justificativas e próximos passos deste projeto.</p></div>
-                    <div class="glass-card p-8 shadow-sm">
-                        <div class="mb-6 flex items-center space-x-4 p-5 rounded-xl border" id="relatorio-farol-container"><div class="text-4xl" id="relatorio-icon">🟢</div><div><h3 class="font-black text-xl" id="relatorio-title">Saudável</h3><p class="text-sm text-slate-600 mt-1" id="relatorio-desc">Projeto operando dentro dos limites normais.</p></div></div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Parecer Executivo Livre</label>
-                        <textarea id="relatorio-text" rows="10" class="w-full rounded-lg border-slate-300 shadow-inner focus:border-blue-500 focus:ring-blue-500 border p-4 text-sm mb-6 outline-none resize-y" placeholder="Escreva o relatório gerencial aqui..."></textarea>
-                        <button onclick="window.salvarRelatorio(event)" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors w-full md:w-auto no-print">💾 Salvar Relatório</button>
-                    </div>
-                </section>
-
                 <!-- VISÃO: CADASTROS DE EQUIPE -->
-                <section id="view-proj-cadastros" class="hidden animate-fade-in w-full max-w-7xl mx-auto">
+                <section id="view-proj-cadastros" class="hidden max-w-7xl mx-auto">
                     <div class="mb-8"><h1 class="text-3xl font-black text-slate-800 tracking-tight">⚙️ Equipe do Projeto</h1><p class="text-slate-500 text-sm mt-1">Gerencie a equipe (recursos) que executa as tarefas exclusivas desta obra/projeto.</p></div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="glass-card p-6 lg:col-span-1 h-fit shadow-sm no-print">
@@ -378,7 +381,7 @@
     <div id="modal-frente" class="fixed inset-0 modal-overlay hidden flex items-center justify-center p-4 z-[150]">
         <form class="bg-white rounded-xl shadow-2xl w-full max-w-sm border border-slate-200 animate-fade-in" onsubmit="event.preventDefault(); window.salvarMacro();">
             <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50"><h2 class="text-lg font-black text-slate-800">Nova Macroatividade</h2><button type="button" onclick="window.fecharModal('modal-frente')" class="text-slate-400 hover:text-slate-800 text-3xl font-bold leading-none">&times;</button></div>
-            <div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade (Agrupador) *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div>
+            <div class="p-6"><label class="block text-xs font-bold text-slate-600 mb-2 uppercase">Nome da Macroatividade *</label><input type="text" id="nf-nome" required class="w-full border-slate-300 rounded-lg border p-2.5 text-sm focus:border-blue-500 outline-none shadow-sm" placeholder="Ex: Fase 1 - Planejamento"></div>
             <div class="p-5 border-t border-slate-100 flex justify-end space-x-3 bg-slate-50"><button type="button" onclick="window.fecharModal('modal-frente')" class="px-4 py-2 font-bold text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors">Cancelar</button><button type="submit" class="px-4 py-2 bg-slate-800 text-white font-bold rounded-lg text-sm hover:bg-slate-900 shadow-md transition-colors">Salvar Frente</button></div>
         </form>
     </div>
@@ -406,7 +409,7 @@
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGURAÇÃO DO FIREBASE (INJETADA)
+        // CONFIGURAÇÃO DO FIREBASE
         // ==========================================
         const MEU_FIREBASE_CONFIG = {
             apiKey: "AIzaSyBvo2JPCQ8e18-lWj4QPtGNwvKbkVnX6nw",
@@ -428,16 +431,13 @@
             db = getFirestore(app); 
         } catch(e) { console.error("Erro Firebase", e); }
 
-        // ==========================================
-        // LOGIN E COFRE NUVEM/LOCAL
-        // ==========================================
         let isCreatingAccount = false;
         
         window.alternarCriarConta = function() {
             isCreatingAccount = !isCreatingAccount;
-            const btnSubmit = document.getElementById('btn-login-submit'), btnToggle = document.getElementById('btn-login-toggle'), title = document.getElementById('login-title'), forgotPass = document.getElementById('forgot-pass-container');
-            if (isCreatingAccount) { title.textContent = "Criar Nova Conta"; btnSubmit.textContent = "Criar Usuário"; btnSubmit.classList.replace('bg-blue-600', 'bg-emerald-600'); btnSubmit.classList.replace('hover:bg-blue-700', 'hover:bg-emerald-700'); btnToggle.textContent = "Voltar ao Login"; forgotPass.classList.add('hidden'); } 
-            else { title.textContent = "Login de Acesso"; btnSubmit.textContent = "Entrar"; btnSubmit.classList.replace('bg-emerald-600', 'bg-blue-600'); btnSubmit.classList.replace('hover:bg-emerald-700', 'hover:bg-blue-700'); btnToggle.textContent = "Criar uma conta"; forgotPass.classList.remove('hidden'); }
+            const btnSubmit = document.getElementById('btn-login-submit'), btnToggle = document.getElementById('btn-login-toggle'), title = document.getElementById('login-title');
+            if (isCreatingAccount) { title.textContent = "Criar Nova Conta"; btnSubmit.textContent = "Criar Usuário"; btnSubmit.classList.replace('bg-blue-600', 'bg-emerald-600'); btnSubmit.classList.replace('hover:bg-blue-700', 'hover:bg-emerald-700'); btnToggle.textContent = "Voltar ao Login"; } 
+            else { title.textContent = "Login de Acesso"; btnSubmit.textContent = "Entrar"; btnSubmit.classList.replace('bg-emerald-600', 'bg-blue-600'); btnSubmit.classList.replace('hover:bg-emerald-700', 'hover:bg-blue-700'); btnToggle.textContent = "Criar uma conta"; }
         }
 
         window.fazerLogin = async function(e) {
@@ -447,7 +447,6 @@
             if(!u || !p) return;
             
             const emailFormatado = u.includes('@') ? u : `${u.toLowerCase()}@progestao.app`;
-            
             const btn = document.getElementById('btn-login-submit');
             const btnText = btn.textContent;
             btn.textContent = "Aguarde..."; btn.disabled = true;
@@ -534,9 +533,6 @@
             }
         }
 
-        // ==========================================
-        // AUTO-EDT (Inteligência de Numeração)
-        // ==========================================
         window.atualizarEDTsGlobais = function() {
             window.PROJETOS_DB.forEach(p => window.atualizarEDTs(p));
         };
@@ -546,14 +542,14 @@
             let fIndex = 1;
             (p.frentes || []).forEach(nomeFrente => {
                 let tarefasFrente = p.tarefas.filter(t => t.frente === nomeFrente);
-                tarefasFrente.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+                tarefasFrente.sort((a, b) => new Date(a.inicio+"T12:00:00") - new Date(b.inicio+"T12:00:00"));
                 let tIndex = 1;
                 tarefasFrente.forEach(t => { t.edt = `${fIndex}.${tIndex}`; tIndex++; });
                 fIndex++;
             });
             let tarefasSemFrente = p.tarefas.filter(t => !(p.frentes || []).includes(t.frente));
             if (tarefasSemFrente.length > 0) {
-                tarefasSemFrente.sort((a, b) => new Date(a.inicio) - new Date(b.inicio));
+                tarefasSemFrente.sort((a, b) => new Date(a.inicio+"T12:00:00") - new Date(b.inicio+"T12:00:00"));
                 let tIndex = 1;
                 tarefasSemFrente.forEach(t => { t.edt = `${fIndex}.${tIndex}`; tIndex++; });
             }
@@ -608,9 +604,6 @@
             window.navGlobal('portfolio'); 
         }
 
-        // ==========================================
-        // CÁLCULOS E GRÁFICOS (Curva S, Gantt, etc)
-        // ==========================================
         const formatarData = (isoDate) => { if(!isoDate) return '-'; const [y,m,d] = isoDate.split('-'); return `${d}/${m}/${y}`; };
         const difDias = (d1, d2) => Math.round((d2.getTime() - d1.getTime()) / (1000*60*60*24));
 
@@ -673,9 +666,30 @@
         }
 
         window.toggleFrente = function(fId) {
-            const tasks = document.querySelectorAll(`.task-of-${fId}`); const icon = document.getElementById(`icon-${fId}`); let isHidden = false;
-            tasks.forEach(t => { if(t.classList.contains('hidden')) { t.classList.remove('hidden'); isHidden = false; } else { t.classList.add('hidden'); isHidden = true; } });
-            if(icon) icon.style.transform = isHidden ? 'rotate(-90deg)' : 'rotate(0deg)';
+            const tasks = document.querySelectorAll(`.task-of-${fId}`); 
+            const icon = document.getElementById(`icon-${fId}`); 
+            if (tasks.length === 0) return;
+            
+            const isHidden = tasks[0].style.display === 'none' || tasks[0].classList.contains('hidden');
+            
+            tasks.forEach(t => { 
+                if (isHidden) { 
+                    t.classList.remove('hidden'); 
+                    t.style.display = 'table-row';
+                } else { 
+                    t.classList.add('hidden'); 
+                    t.style.display = 'none';
+                } 
+            });
+            
+            if(icon) icon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+            
+            setTimeout(() => {
+                const tb = document.getElementById('cronograma-table-body'); const line = document.getElementById('red-line-projeto');
+                if(tb && line) { line.style.height = (tb.offsetHeight + 40) + 'px'; }
+                const tbGlob = document.getElementById('global-timeline-body'); const lineGlob = document.getElementById('red-line-global');
+                if(tbGlob && lineGlob) { lineGlob.style.height = (tbGlob.offsetHeight + 40) + 'px'; }
+            }, 50);
         };
 
         window.exportarExcel = function() {
@@ -686,14 +700,35 @@
                 XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dados), "Portfólio_Global"); XLSX.writeFile(wb, "ProGestao_Portfolio.xlsx");
             } else {
                 const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); if(!p) return;
-                let dados = p.tarefas.length === 0 ? [{ "Fase": "-", "EDT": "-", "Atividade": "Nenhuma tarefa", "Responsável": "-", "Início": "-", "Término": "-", "Progresso (%)": "-", "Status": "-" }] : [...p.tarefas].sort((a,b) => new Date(a.inicio) - new Date(b.inicio)).map(t => { const resp = p.equipe?.find(u => u.id == t.respId)?.nome || 'Não Atribuído'; return { "Fase": t.frente || 'GERAL', "EDT": t.edt || '', "Atividade": t.nome, "Responsável": resp, "Início": formatarData(t.inicio), "Término": formatarData(t.fim), "Progresso (%)": t.progresso, "Status": statusDaTarefa(t.inicio, t.fim, t.progresso) }; });
+                let dados = p.tarefas.length === 0 ? [{ "Fase": "-", "EDT": "-", "Atividade": "Nenhuma tarefa", "Responsável": "-", "Início": "-", "Término": "-", "Progresso (%)": "-", "Status": "-" }] : [...p.tarefas].sort((a,b) => new Date(a.inicio+"T12:00:00") - new Date(b.inicio+"T12:00:00")).map(t => { const resp = p.equipe?.find(u => u.id == t.respId)?.nome || 'Não Atribuído'; return { "Fase": t.frente || 'GERAL', "EDT": t.edt || '', "Atividade": t.nome, "Responsável": resp, "Início": formatarData(t.inicio), "Término": formatarData(t.fim), "Progresso (%)": t.progresso, "Status": statusDaTarefa(t.inicio, t.fim, t.progresso) }; });
                 let nomeAba = p.nome.replace(/[\\\/\?\*\[\]]/g, '').substring(0, 30); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dados), nomeAba); XLSX.writeFile(wb, `Cronograma_${nomeAba.replace(/\s+/g, '_')}.xlsx`);
             }
         }
 
-        // ==========================================
-        // RENDERIZAÇÃO DE INTERFACE
-        // ==========================================
+        window.dragStart = function(e, id) {
+            e.dataTransfer.setData('text/plain', id); e.dataTransfer.effectAllowed = 'move';
+            setTimeout(() => { e.currentTarget.classList.add('opacity-40', 'scale-95'); }, 10);
+        };
+        window.dragOver = function(e) {
+            e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+            const card = e.currentTarget; if(!card.classList.contains('border-blue-400')) card.classList.add('border-blue-400', 'bg-blue-50', 'scale-[1.02]');
+        };
+        window.dragLeave = function(e) { e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50', 'scale-[1.02]'); };
+        window.drop = function(e, targetId) {
+            e.preventDefault(); const draggedId = e.dataTransfer.getData('text/plain');
+            if (draggedId && draggedId !== targetId) {
+                const draggedIdx = window.PROJETOS_DB.findIndex(p => p.id === draggedId);
+                const targetIdx = window.PROJETOS_DB.findIndex(p => p.id === targetId);
+                if (draggedIdx > -1 && targetIdx > -1) {
+                    const item = window.PROJETOS_DB.splice(draggedIdx, 1)[0];
+                    window.PROJETOS_DB.splice(targetIdx, 0, item);
+                    window.saveToCloud();
+                }
+            }
+            window.renderGlobal();
+        };
+        window.dragEnd = function(e) { window.renderGlobal(); };
+
         window.carregarListasBase = function() {
             const optData = { year: 'numeric', month: '2-digit', day: '2-digit' }; document.getElementById('current-date-display').textContent = window.state.hoje.toLocaleDateString('pt-BR', optData);
             document.getElementById('header-project-list').innerHTML = window.PROJETOS_DB.length === 0 ? '<option disabled>Nenhum projeto ativo</option>' : window.PROJETOS_DB.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
@@ -706,8 +741,22 @@
         window.toggleInsightProject = function(pId) { const idx = window.state.insightsSelectedProjects.indexOf(pId); if (idx > -1) window.state.insightsSelectedProjects.splice(idx, 1); else window.state.insightsSelectedProjects.push(pId); window.renderGlobal(); }
 
         window.applyView = function() {
-            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden')); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const isGlob = window.state.viewType === 'global'; document.getElementById(`view-${isGlob ? '' : 'proj-'}${window.state.currentView}`).classList.remove('hidden'); document.getElementById(`nav-${isGlob ? '' : 'proj-'}${window.state.currentView}`)?.classList.add('active'); document.getElementById('sidebar-project-menu').classList.toggle('hidden', isGlob);
+            document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden')); 
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            const isGlob = window.state.viewType === 'global'; 
+            const targetId = `view-${isGlob ? '' : 'proj-'}${window.state.currentView}`;
+            const activeSection = document.getElementById(targetId);
+            
+            if(activeSection) {
+                activeSection.classList.remove('animate-fade-in');
+                void activeSection.offsetWidth; 
+                activeSection.classList.add('animate-fade-in');
+                activeSection.classList.remove('hidden');
+            }
+
+            document.getElementById(`nav-${isGlob ? '' : 'proj-'}${window.state.currentView}`)?.classList.add('active'); 
+            document.getElementById('sidebar-project-menu').classList.toggle('hidden', isGlob);
         }
 
         window.duplicarProjeto = function(id) {
@@ -727,7 +776,7 @@
                 if(window.PROJETOS_DB.length === 0) { grid.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center p-16 text-slate-500 bg-white rounded-xl border border-dashed border-slate-300"><span class="text-6xl mb-4">📁</span><p class="text-xl font-bold text-slate-700">Nenhum projeto encontrado.</p></div>`; return; }
                 window.PROJETOS_DB.forEach(p => {
                     const s = analiseProjeto(p); const cli = window.CLIENTES_DB.find(c=>c.id==p.clienteId)?.nome||'Cliente Não Informado';
-                    grid.innerHTML += `<div class="glass-card p-6 cursor-pointer border-t-4 border-t-${s.color}-500 hover:-translate-y-1 transition-transform flex flex-col justify-between" onclick="document.getElementById('project-selector').value='${p.id}'; window.mudarContexto('${p.id}');"><div><div class="flex justify-between items-start mb-2"><h3 class="font-black text-slate-800 text-lg pr-2 leading-tight">${p.nome}</h3><div class="flex items-center space-x-2 flex-shrink-0"><button onclick="window.duplicarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-indigo-600 transition-colors" title="Duplicar Projeto">📑</button><button onclick="window.editarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-blue-600 transition-colors" title="Editar Projeto">✏️</button><button onclick="window.deletarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-rose-600 transition-colors" title="Excluir">🗑️</button></div></div><div class="mb-4 inline-block"><span class="px-2 py-1 bg-${s.color}-100 text-${s.color}-700 text-[10px] font-bold rounded uppercase tracking-wider">${s.badge}</span></div><p class="text-xs font-semibold text-slate-500 mb-4">${cli} • ${p.area || 'Geral'}</p></div><div><div class="flex justify-between text-xs font-bold mb-1"><span class="text-slate-500">Avanço Físico</span><span class="text-blue-600">${s.avanco}%</span></div><div class="w-full bg-slate-100 rounded-full h-2.5 mb-4"><div class="bg-blue-600 h-2.5 rounded-full" style="width: ${s.avanco}%"></div></div><div class="text-xs font-semibold text-slate-500 border-t border-slate-100 pt-3 flex justify-between"><span>Início: ${formatarData(p.inicio)}</span>${s.atr>0 ? `<span class="text-rose-600">🔴 ${s.atr} atrasos</span>` : `<span class="text-emerald-600">✅ Em dia</span>`}</div></div></div>`;
+                    grid.innerHTML += `<div draggable="true" ondragstart="window.dragStart(event, '${p.id}')" ondragover="window.dragOver(event)" ondragleave="window.dragLeave(event)" ondrop="window.drop(event, '${p.id}')" ondragend="window.dragEnd(event)" class="glass-card p-6 cursor-move border-2 border-transparent border-t-4 border-t-${s.color}-500 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between" onclick="document.getElementById('project-selector').value='${p.id}'; window.mudarContexto('${p.id}');"><div><div class="flex justify-between items-start mb-2"><div class="flex items-center gap-2"><span class="text-slate-300 hover:text-slate-500 cursor-grab active:cursor-grabbing transition-colors text-lg" title="Arraste para reordenar">⠿</span><h3 class="font-black text-slate-800 text-lg pr-2 leading-tight">${p.nome}</h3></div><div class="flex items-center space-x-2 flex-shrink-0"><button onclick="window.duplicarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-indigo-600 transition-colors" title="Duplicar Projeto">📑</button><button onclick="window.editarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-blue-600 transition-colors" title="Editar Projeto">✏️</button><button onclick="window.deletarProjeto('${p.id}'); event.stopPropagation();" class="text-slate-400 hover:text-rose-600 transition-colors" title="Excluir">🗑️</button></div></div><div class="mb-4 inline-block"><span class="px-2 py-1 bg-${s.color}-100 text-${s.color}-700 text-[10px] font-bold rounded uppercase tracking-wider whitespace-nowrap">${s.badge}</span></div><p class="text-xs font-semibold text-slate-500 mb-4">${cli} • ${p.area || 'Geral'}</p></div><div><div class="flex justify-between text-xs font-bold mb-1"><span class="text-slate-500">Avanço Físico</span><span class="text-blue-600">${s.avanco}%</span></div><div class="w-full bg-slate-100 rounded-full h-2.5 mb-4"><div class="bg-blue-600 h-2.5 rounded-full" style="width: ${s.avanco}%"></div></div><div class="text-xs font-semibold text-slate-500 border-t border-slate-100 pt-3 flex justify-between"><span>Início: ${formatarData(p.inicio)}</span>${s.atr>0 ? `<span class="text-rose-600">🔴 ${s.atr} atrasos</span>` : `<span class="text-emerald-600">✅ Em dia</span>`}</div></div></div>`;
                 });
             } else if(window.state.currentView === 'clientes') {
                 const tbody = document.getElementById('clientes-table-body');
@@ -766,36 +815,55 @@
                     projsSel.forEach(p => { let pi = new Date(p.inicio+"T12:00:00"), pf = new Date(p.fim+"T12:00:00"); if(!gIni || pi < gIni) gIni = pi; if(!gFim || pf > gFim) gFim = pf; p.tarefas.forEach(t => allTarefasGlobal.push(t)); });
 
                     const dadosSGlobal = window.calcularCurvaS(allTarefasGlobal);
-                    if(window.charts.globalCurvaS) window.charts.globalCurvaS.destroy();
-                    window.charts.globalCurvaS = new Chart(document.getElementById('globalCurvaSChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(dadosSGlobal).length > 0 ? dadosSGlobal.labels : [''], datasets: [{ label:'Previsto Acumulado', data:dadosSGlobal.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4 }, { label:'Realizado Histórico', data:dadosSGlobal.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff' }] }, options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}} } });
+                    
+                    setTimeout(() => {
+                        if(window.charts.globalCurvaS) window.charts.globalCurvaS.destroy();
+                        window.charts.globalCurvaS = new Chart(document.getElementById('globalCurvaSChart').getContext('2d'), { 
+                            type: 'line', 
+                            data: { labels: Object.keys(dadosSGlobal).length > 0 ? dadosSGlobal.labels : [''], datasets: [{ label:'Previsto Acumulado', data:dadosSGlobal.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4, tension: 0.3 }, { label:'Realizado Histórico', data:dadosSGlobal.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff', tension: 0.3 }] }, 
+                            options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}}, animation: { y: { duration: 1200, easing: 'easeOutQuart', from: (ctx) => ctx.chart.scales.y ? ctx.chart.scales.y.getPixelForValue(0) : 0 } } } 
+                        });
+                    }, 150);
 
                     const tlBody = document.getElementById('global-timeline-body'); const thGlobTl = document.getElementById('th-global-timeline');
                     if(projsSel.length === 0) { tlBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Nenhum projeto selecionado.</td></tr>`; if(thGlobTl) thGlobTl.innerHTML = '<div class="px-6 pt-8 pb-2 w-full h-full flex items-end">Timeline</div>'; } 
                     else {
-                        if(!gIni) gIni = new Date(); if(!gFim) gFim = new Date(); gIni.setDate(gIni.getDate() - 3); gFim.setDate(gFim.getDate() + 10);
-                        const totalGlobDias = Math.max(difDias(gIni, gFim), 1); const hojeLocal = new Date(window.state.hoje.toISOString().split('T')[0]+"T12:00:00");
+                        const hojeLocal = new Date(window.state.hoje.toISOString().split('T')[0]+"T12:00:00");
+                        if(!gIni) gIni = new Date(hojeLocal); if(!gFim) gFim = new Date(hojeLocal); 
+                        let dataLimite = new Date(hojeLocal); dataLimite.setMonth(dataLimite.getMonth() + 3);
+                        if (hojeLocal < gIni) gIni = new Date(hojeLocal); if (dataLimite > gFim) gFim = new Date(dataLimite);
+                        gIni.setDate(gIni.getDate() - 5); gFim.setDate(gFim.getDate() + 15);
+                        const totalGlobDias = Math.max(difDias(gIni, gFim), 1); 
                         let hPercGlob = -1; if (hojeLocal >= gIni && hojeLocal <= gFim) hPercGlob = (difDias(gIni, hojeLocal) / totalGlobDias) * 100;
-                        if(thGlobTl) thGlobTl.innerHTML = `<div class="relative w-full h-full pt-8 pb-2">${gerarMesesHeader(gIni, gFim, totalGlobDias)}${hPercGlob >= 0 ? `<div class="absolute top-6 bottom-0 w-[2px] bg-red-500 z-40 shadow-[0_0_5px_rgba(239,68,68,0.5)]" style="left: ${hPercGlob}%;"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-md tracking-wider">HOJE</span></div>` : ''}</div>`;
+
+                        if(thGlobTl) thGlobTl.innerHTML = `<div class="relative w-full h-full min-w-[500px] min-h-[40px] pt-8 pb-2">${gerarMesesHeader(gIni, gFim, totalGlobDias)}${hPercGlob >= 0 ? `<div id="red-line-global" class="absolute top-6 w-[2px] bg-red-500 z-[60] pointer-events-none hidden" style="left: ${hPercGlob}%;"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded tracking-wider">HOJE</span></div>` : ''}</div>`;
+                        
                         tlBody.innerHTML = projsSel.sort((a,b)=>new Date(a.inicio)-new Date(b.inicio)).map(p => {
                             const s = analiseProjeto(p); const pLeft = (difDias(gIni, new Date(p.inicio+"T12:00:00")) / totalGlobDias) * 100; const pWidth = Math.max((difDias(new Date(p.inicio+"T12:00:00"), new Date(p.fim+"T12:00:00")) / totalGlobDias) * 100, 0.5);
                             let hexT = '#94a3b8'; if(s.badge === 'No Prazo') hexT = '#10b981'; else if(s.badge === 'Atrasado') hexT = '#ef4444'; else if(s.badge === 'Em Risco') hexT = '#f59e0b';
-                            return `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-4 font-black text-slate-800 text-xs">${p.nome}</td><td class="px-4 py-4 text-[10px] font-bold text-slate-600">${formatarData(p.inicio)} - ${formatarData(p.fim)}</td><td class="px-2 py-4 text-center font-black text-blue-700 text-sm">${s.avanco}%</td><td class="px-4 py-4 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(s.badge,'text')} shadow-sm">${s.badge}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGlob >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGlob}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-[8px] bottom-[8px] rounded-md shadow-sm overflow-hidden" style="left: ${pLeft}%; width: ${pWidth}%; background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full" style="width: ${s.avanco}%; background-color: ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${s.avanco > 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: calc(${pLeft + pWidth}% + 6px);"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded shadow-sm whitespace-nowrap">${s.avanco}%</span></div>` : ''}</div></td></tr>`;
+                            return `<tr class="hover:bg-slate-50 transition-colors"><td class="px-6 py-4 font-black text-slate-800 text-xs">${p.nome}</td><td class="px-4 py-4 text-[10px] font-bold text-slate-600 whitespace-nowrap">${formatarData(p.inicio)} - ${formatarData(p.fim)}</td><td class="px-2 py-4 text-center font-black text-blue-700 text-sm">${s.avanco}%</td><td class="px-4 py-4 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(s.badge,'text')} shadow-sm">${s.badge}</span></td><td class="p-0 align-middle border-l border-r border-slate-200 h-full relative z-10"><div class="relative w-full h-full min-w-[500px] min-h-[48px] px-6 flex items-center"><div class="absolute top-1/2 -translate-y-1/2 rounded-[6px] overflow-hidden" style="left: ${pLeft}%; width: ${pWidth}%; height: 28px; background-color: #f1f5f9 !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; border: 1px solid #e2e8f0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full rounded-[6px]" style="width: ${s.avanco}%; background-color: ${hexT} !important; box-shadow: inset 0 0 0 1000px ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${s.avanco >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: ${pLeft + pWidth}%; margin-left: 8px;"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded shadow-sm whitespace-nowrap">${s.avanco}%</span></div>` : ''}</div></td></tr>`;
                         }).join('');
+
+                        setTimeout(() => {
+                            const tbGlob = document.getElementById('global-timeline-body'); const lineGlob = document.getElementById('red-line-global');
+                            if(tbGlob && lineGlob) { lineGlob.style.height = (tbGlob.offsetHeight + 40) + 'px'; lineGlob.classList.remove('hidden'); }
+                        }, 100);
                     }
                 }
                 
                 document.getElementById('ins-total').textContent = window.PROJETOS_DB.length; document.getElementById('ins-prazo').textContent = prazo; document.getElementById('ins-risco').textContent = risco; document.getElementById('ins-atrasados').textContent = atr;
                 document.getElementById('ins-tmedio').textContent = window.PROJETOS_DB.length ? Math.round(tMedio/window.PROJETOS_DB.length) : 0; document.getElementById('ins-desvio').textContent = window.PROJETOS_DB.length ? Math.round(tDesvio/window.PROJETOS_DB.length) : 0;
                 document.getElementById('st-glb-conc').textContent = stConc; document.getElementById('st-glb-and').textContent = stAnd; document.getElementById('st-glb-atr').textContent = stAtr; document.getElementById('st-glb-nao').textContent = stNao;
-                document.getElementById('insight-projetos-body').innerHTML = projRows;
 
-                let lblsCons = Object.values(hConsultor).map(v=>v.nome), dtCons = Object.values(hConsultor).map(v=>v.count?Math.round(v.saude/v.count):0);
-                if(lblsCons.length===0) { lblsCons=['Sem Dados']; dtCons=[0]; }
-                const ctxCons = document.getElementById('chartConsultor').getContext('2d'); if(window.charts.chartConsultor) window.charts.chartConsultor.destroy(); window.charts.chartConsultor = new Chart(ctxCons, { type: 'bar', data: { labels: lblsCons, datasets: [{ data: dtCons, backgroundColor: '#3b82f6', barThickness: 15, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: {min:0, max:100}, y: {grid:{display:false}} } } });
-                
-                let lblsCli = Object.keys(hCliente), dtCli = Object.values(hCliente).map(v=>v.count?Math.round(v.saude/v.count):0);
-                if(lblsCli.length===0) { lblsCli=['Sem Dados']; dtCli=[0]; }
-                const ctxCli = document.getElementById('chartCliente').getContext('2d'); if(window.charts.chartCliente) window.charts.chartCliente.destroy(); window.charts.chartCliente = new Chart(ctxCli, { type: 'bar', data: { labels: lblsCli, datasets: [{ data: dtCli, backgroundColor: '#10b981', barThickness: 15, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: {min:0, max:100}, y: {grid:{display:false}} } } });
+                setTimeout(() => {
+                    let lblsCons = Object.values(hConsultor).map(v=>v.nome), dtCons = Object.values(hConsultor).map(v=>v.count?Math.round(v.saude/v.count):0);
+                    if(lblsCons.length===0) { lblsCons=['Sem Dados']; dtCons=[0]; }
+                    const ctxCons = document.getElementById('chartConsultor').getContext('2d'); if(window.charts.chartConsultor) window.charts.chartConsultor.destroy(); window.charts.chartConsultor = new Chart(ctxCons, { type: 'bar', data: { labels: lblsCons, datasets: [{ data: dtCons, backgroundColor: '#3b82f6', barThickness: 15, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: {min:0, max:100}, y: {grid:{display:false}} }, animation: { duration: 1200, easing: 'easeOutQuart' } } });
+                    
+                    let lblsCli = Object.keys(hCliente), dtCli = Object.values(hCliente).map(v=>v.count?Math.round(v.saude/v.count):0);
+                    if(lblsCli.length===0) { lblsCli=['Sem Dados']; dtCli=[0]; }
+                    const ctxCli = document.getElementById('chartCliente').getContext('2d'); if(window.charts.chartCliente) window.charts.chartCliente.destroy(); window.charts.chartCliente = new Chart(ctxCli, { type: 'bar', data: { labels: lblsCli, datasets: [{ data: dtCli, backgroundColor: '#10b981', barThickness: 15, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: {min:0, max:100}, y: {grid:{display:false}} }, animation: { duration: 1200, easing: 'easeOutQuart' } } });
+                }, 150);
             }
         }
 
@@ -811,13 +879,24 @@
                 document.getElementById('dash-tplanejado').textContent = s.tPlanejado; document.getElementById('dash-desvio').textContent = s.desvioMedio;
 
                 const dadosS = window.calcularCurvaS(p.tarefas);
-                if(window.charts.curvaS) window.charts.curvaS.destroy();
-                window.charts.curvaS = new Chart(document.getElementById('curvaSChart').getContext('2d'), { type: 'line', data: { labels: Object.keys(dadosS).length > 0 ? dadosS.labels : [''], datasets: [ { label:'Previsto Acumulado', data:dadosS.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4 }, { label:'Realizado Histórico', data:dadosS.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff' } ] }, options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}} } });
+                
+                setTimeout(() => {
+                    if(window.charts.curvaS) window.charts.curvaS.destroy();
+                    window.charts.curvaS = new Chart(document.getElementById('curvaSChart').getContext('2d'), { 
+                        type: 'line', 
+                        data: { labels: Object.keys(dadosS).length > 0 ? dadosS.labels : [''], datasets: [ { label:'Previsto Acumulado', data:dadosS.previsto, borderColor:'#94a3b8', borderDash:[5,5], pointRadius: 4, tension: 0.3 }, { label:'Realizado Histórico', data:dadosS.realizado, borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.1)', fill:true, borderWidth:3, pointRadius: 5, pointBackgroundColor: '#fff', tension: 0.3 } ] }, 
+                        options: { responsive:true, maintainAspectRatio:false, scales:{y:{min:0,max:100}}, plugins:{legend:{position:'top'}}, animation: { y: { duration: 1200, easing: 'easeOutQuart', from: (ctx) => ctx.chart.scales.y ? ctx.chart.scales.y.getPixelForValue(0) : 0 } } } 
+                    });
 
-                let counts = {'Concluída':0, 'Em Andamento':0, 'Atrasada':0, 'Não Iniciada':0};
-                p.tarefas.forEach(t => counts[statusDaTarefa(t.inicio, t.fim, t.progresso)]++); if(p.tarefas.length === 0) counts = {'Sem Tarefas': 1};
-                if(window.charts.donut) window.charts.donut.destroy();
-                window.charts.donut = new Chart(document.getElementById('statusDonutChart').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: p.tarefas.length===0?['#cbd5e1']:['#10b981', '#3b82f6', '#ef4444', '#94a3b8'], borderWidth:2, borderColor: '#fff' }] }, options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position: 'bottom', labels: { usePointStyle: true, padding: 20, font: {family: 'Inter'} }}} } });
+                    let counts = {'Concluída':0, 'Em Andamento':0, 'Atrasada':0, 'Não Iniciada':0};
+                    p.tarefas.forEach(t => counts[statusDaTarefa(t.inicio, t.fim, t.progresso)]++); if(p.tarefas.length === 0) counts = {'Sem Tarefas': 1};
+                    if(window.charts.donut) window.charts.donut.destroy();
+                    window.charts.donut = new Chart(document.getElementById('statusDonutChart').getContext('2d'), { 
+                        type: 'doughnut', 
+                        data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: p.tarefas.length===0?['#cbd5e1']:['#10b981', '#3b82f6', '#ef4444', '#94a3b8'], borderWidth:2, borderColor: '#fff' }] }, 
+                        options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position: 'bottom', labels: { usePointStyle: true, padding: 20, font: {family: 'Inter'} }}}, animation: { animateRotate: true, animateScale: false, duration: 1000, easing: 'easeOutQuart' } } 
+                    });
+                }, 150);
 
                 let tm = {}; (p.equipe||[]).forEach(u => tm[u.id] = {nome:u.nome, t:0, p:0, c:0, a:0, atr:0});
                 p.tarefas.forEach(t => { if(tm[t.respId]) { tm[t.respId].t++; tm[t.respId].p+=Number(t.progresso); const st=statusDaTarefa(t.inicio,t.fim,t.progresso); if(st==='Concluída') tm[t.respId].c++; if(st==='Em Andamento') tm[t.respId].a++; if(st==='Atrasada') tm[t.respId].atr++; } });
@@ -826,7 +905,6 @@
                 else { document.getElementById('resumo-time-body').innerHTML = tmBody.map(x=> { const avg = Math.round(x.p/x.t); return `<tr><td class="px-6 py-4 font-bold text-slate-700">${x.nome}</td><td class="px-6 py-4"><span class="text-blue-600 font-black">${avg}%</span><div class="w-full bg-slate-100 rounded-full h-1.5 mt-1"><div class="bg-blue-500 h-full rounded-full" style="width:${avg}%"></div></div></td><td class="px-6 py-4 text-center font-bold text-slate-700">${x.t}</td><td class="px-6 py-4 text-center text-emerald-600 font-bold">${x.c}</td><td class="px-6 py-4 text-center text-blue-600 font-bold">${x.a}</td><td class="px-6 py-4 text-center text-rose-600 font-black">${x.atr}</td></tr>`; }).join(''); }
             }
             else if(window.state.currentView === 'cronograma') { window.renderCronogramaFrentes(p); }
-            else if(window.state.currentView === 'relatorio') { document.getElementById('relatorio-text').value = p.relatorio || ""; document.getElementById('relatorio-farol-container').className = `mb-6 flex items-center space-x-4 p-5 rounded-xl border bg-${s.color}-50 border-${s.color}-200`; document.getElementById('relatorio-icon').textContent = s.badge==='Atrasado'?'🔴':s.badge==='Em Risco'?'🟡':'🟢'; document.getElementById('relatorio-title').textContent = s.badge; document.getElementById('relatorio-title').className = `font-black text-xl text-${s.color}-800`; }
             else if(window.state.currentView === 'cadastros') {
                 const lista = document.getElementById('lista-equipe-projeto');
                 if(!p.equipe || p.equipe.length === 0) { lista.innerHTML = `<li class="px-6 py-8 text-center text-slate-500 text-sm">Nenhum membro cadastrado nesta obra.</li>`; return; }
@@ -849,11 +927,16 @@
             const hojeLocal = new Date(window.state.hoje.toISOString().split('T')[0]+"T12:00:00");
             let projIni = new Date(p.inicio + "T12:00:00"), projFim = new Date(p.fim + "T12:00:00");
             p.tarefas.forEach(t => { const dI = new Date(t.inicio + "T12:00:00"); const dF = new Date(t.fim + "T12:00:00"); if(!isNaN(dI) && dI < projIni) projIni = dI; if(!isNaN(dF) && dF > projFim) projFim = dF; });
-            projIni.setDate(projIni.getDate() - 3); projFim.setDate(projFim.getDate() + 10);
+            
+            let dataLimiteFrente = new Date(hojeLocal); dataLimiteFrente.setMonth(dataLimiteFrente.getMonth() + 3);
+            if (hojeLocal < projIni) projIni = new Date(hojeLocal); 
+            if (dataLimiteFrente > projFim) projFim = new Date(dataLimiteFrente);
+            
+            projIni.setDate(projIni.getDate() - 5); projFim.setDate(projFim.getDate() + 15);
             const totalProjDias = Math.max(difDias(projIni, projFim), 1);
             let hPercGeral = -1; if (hojeLocal >= projIni && hojeLocal <= projFim) hPercGeral = (difDias(projIni, hojeLocal) / totalProjDias) * 100;
 
-            if(thAcomp) thAcomp.innerHTML = `<div class="relative w-full h-full pt-8 pb-2">${gerarMesesHeader(projIni, projFim, totalProjDias)}${hPercGeral >= 0 ? `<div class="absolute top-6 bottom-0 w-[2px] bg-red-500 z-40 shadow-[0_0_5px_rgba(239,68,68,0.5)]" style="left: ${hPercGeral}%;"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded shadow-md tracking-wider">HOJE</span></div>` : ''}</div>`;
+            if(thAcomp) thAcomp.innerHTML = `<div class="relative w-full h-full min-w-[500px] min-h-[40px] pt-8 pb-2">${gerarMesesHeader(projIni, projFim, totalProjDias)}${hPercGeral >= 0 ? `<div id="red-line-projeto" class="absolute top-6 w-[2px] bg-red-500 z-[60] pointer-events-none hidden" style="left: ${hPercGeral}%;"><span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-black text-white bg-red-500 px-1.5 py-0.5 rounded tracking-wider">HOJE</span></div>` : ''}</div>`;
 
             const frentesDict = {}; (p.frentes||[]).forEach(f => frentesDict[f] = { nome: f, tarefas: [], tProg: 0, dMin: null, dMax: null, statuses: [] });
             p.tarefas.forEach(t => { 
@@ -864,31 +947,57 @@
             });
 
             let html = '';
-            Object.values(frentesDict).forEach(f => {
-                const avg = f.tarefas.length > 0 ? Math.round(f.tProg / f.tarefas.length) : 0;
-                let dataText = "Sem tarefas", fLeft = 0, fWidth = 0;
-                if(f.dMin && f.dMax) { dataText = `${formatarData(f.dMin.toISOString().split('T')[0])} até ${formatarData(f.dMax.toISOString().split('T')[0])}`; fLeft = (difDias(projIni, f.dMin) / totalProjDias) * 100; fWidth = Math.max((difDias(f.dMin, f.dMax) / totalProjDias) * 100, 0.5); }
-                const safeFrenteId = `frente-${f.nome.replace(/\W/g, '')}`;
-
-                let hasAtrasada = f.statuses.includes('Atrasada');
-                let hasAndamento = f.statuses.includes('Em Andamento');
-                let allConcluida = f.tarefas.length > 0 && f.statuses.every(s => s === 'Concluída');
-                let hexBg = '#94a3b8'; // Cinza 
-                if(hasAtrasada) hexBg = '#ef4444'; // Vermelho
-                else if(hasAndamento || (f.statuses.includes('Concluída') && !allConcluida)) hexBg = '#3b82f6'; // Azul
-                else if(allConcluida) hexBg = '#10b981'; // Verde
-
-                html += `<tr class="frente-row" onclick="window.toggleFrente('${safeFrenteId}')"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider select-none"><span id="icon-${safeFrenteId}" class="inline-block transition-transform duration-200 mr-1 text-slate-400 no-print">▼</span> ◪ ${f.nome}</td><td class="px-4 py-3 text-[10px] font-bold text-slate-600 select-none whitespace-nowrap">${dataText}</td><td class="px-2 py-3 text-center font-black text-blue-700 text-sm select-none">${avg}%</td><td class="px-4 py-3"></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle select-none">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-3 w-full h-full relative">${f.dMin ? `<div class="absolute top-1/2 -translate-y-1/2 rounded-md shadow-md overflow-hidden" style="left: ${fLeft}%; width: ${fWidth}%; height: 20px; border: 1px solid #cbd5e1; background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full" style="width: ${avg}%; background-color: ${hexBg} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${avg >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: calc(${fLeft + fWidth}% + 6px);"><span class="text-[11px] font-black text-slate-800 bg-white/90 px-1 rounded shadow-sm whitespace-nowrap">${avg}%</span></div>` : ''}` : ''}</div></td><td class="px-4 py-3 text-right no-print"><button onclick="window.abrirEditarFrente('${f.nome}'); event.stopPropagation();" class="text-blue-500 hover:text-blue-700 transition-colors text-lg mr-2" title="Editar Frente">✏️</button><button onclick="window.deletarFrente('${f.nome}'); event.stopPropagation();" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Excluir Frente">🗑️</button></td></tr>`;
+            let fIndex = 1;
+            
+            (p.frentes || []).forEach(nomeFrente => {
+                let tarefasDaFrente = p.tarefas.filter(t => t.frente === nomeFrente);
+                let tProg = 0; let fStatuses = []; let fMin = null; let fMax = null;
                 
-                f.tarefas.sort((a,b)=>new Date(a.inicio)-new Date(b.inicio)).forEach(t => {
+                tarefasDaFrente.forEach(t => {
+                    tProg += Number(t.progresso); fStatuses.push(statusDaTarefa(t.inicio, t.fim, t.progresso));
+                    const dI = new Date(t.inicio+"T12:00:00"), dF = new Date(t.fim+"T12:00:00");
+                    if(!fMin || dI < fMin) fMin = dI; if(!fMax || dF > fMax) fMax = dF;
+                });
+
+                const avg = tarefasDaFrente.length > 0 ? Math.round(tProg / tarefasDaFrente.length) : 0;
+                let dataText = "Sem tarefas", fLeft = 0, fWidth = 0;
+                if(fMin && fMax) { dataText = `${formatarData(fMin.toISOString().split('T')[0])} até ${formatarData(fMax.toISOString().split('T')[0])}`; fLeft = (difDias(projIni, fMin) / totalProjDias) * 100; fWidth = Math.max((difDias(fMin, fMax) / totalProjDias) * 100, 0.5); }
+                const safeFrenteId = `frente-${fIndex}`;
+
+                let hasAtrasada = fStatuses.includes('Atrasada'); let hasAndamento = fStatuses.includes('Em Andamento'); let allConcluida = tarefasDaFrente.length > 0 && fStatuses.every(s => s === 'Concluída');
+                let hexFrenteOuter = '#f1f5f9'; let hexFrenteInner = '#94a3b8'; 
+                if(hasAtrasada) { hexFrenteOuter = '#fee2e2'; hexFrenteInner = '#ef4444'; } else if(allConcluida) { hexFrenteOuter = '#d1fae5'; hexFrenteInner = '#10b981'; } else if(hasAndamento || (fStatuses.includes('Concluída') && !allConcluida)) { hexFrenteOuter = '#dbf4ff'; hexFrenteInner = '#3b82f6'; }
+
+                html += `<tr class="frente-row" onclick="window.toggleFrente('${safeFrenteId}')"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider select-none"><span id="icon-${safeFrenteId}" class="inline-block transition-transform duration-200 mr-2 text-slate-400 no-print">▼</span> ${fIndex} - ${nomeFrente}</td><td class="px-4 py-3 text-[10px] font-bold text-slate-600 select-none whitespace-nowrap">${dataText}</td><td class="px-2 py-3 text-center font-black text-blue-700 text-sm select-none">${avg}%</td><td class="px-4 py-3"></td><td class="p-0 align-middle border-l border-r border-slate-200 select-none h-full relative z-10"><div class="relative w-full h-full min-w-[500px] min-h-[48px] flex items-center">${fMin ? `<div class="absolute top-1/2 -translate-y-1/2 rounded-[6px] overflow-hidden" style="left: ${fLeft}%; width: ${fWidth}%; height: 28px; background-color: ${hexFrenteOuter} !important; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full rounded-[6px]" style="width: ${avg}%; background-color: ${hexFrenteInner} !important; box-shadow: inset 0 0 0 1000px ${hexFrenteInner} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${avg >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: ${fLeft + fWidth}%; margin-left: 8px;"><span class="text-[11px] font-black text-slate-800 bg-white/90 px-1 rounded shadow-sm whitespace-nowrap">${avg}%</span></div>` : ''}` : ''}</div></td><td class="px-4 py-3 text-right no-print"><button onclick="window.abrirEditarFrente('${nomeFrente}'); event.stopPropagation();" class="text-blue-500 hover:text-blue-700 transition-colors text-lg mr-2" title="Editar Frente">✏️</button><button onclick="window.deletarFrente('${nomeFrente}'); event.stopPropagation();" class="text-slate-300 hover:text-rose-600 transition-colors text-lg" title="Excluir Frente">🗑️</button></td></tr>`;
+                
+                tarefasDaFrente.sort((a,b)=>new Date(a.inicio+"T12:00:00")-new Date(b.inicio+"T12:00:00")).forEach(t => {
                     const resp = p.equipe?.find(u=>u.id==t.respId)?.nome||'Não Atribuído'; const st = statusDaTarefa(t.inicio, t.fim, t.progresso);
                     let tLeft = (difDias(projIni, new Date(t.inicio+"T12:00:00")) / totalProjDias) * 100; let tWidth = Math.max((difDias(new Date(t.inicio+"T12:00:00"), new Date(t.fim+"T12:00:00")) / totalProjDias) * 100, 0.5);
                     let hexT = '#94a3b8'; if(st === 'Concluída') hexT = '#10b981'; else if(st === 'Atrasada') hexT = '#ef4444'; else if(st === 'Em Andamento') hexT = '#3b82f6';
-
-                    html += `<tr class="hover:bg-slate-50 transition-colors task-of-${safeFrenteId}"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="window.editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium whitespace-nowrap"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="window.updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 relative min-w-[500px] border-l border-r border-slate-200 align-middle">${hPercGeral >= 0 ? `<div class="absolute top-0 bottom-0 w-[2px] bg-red-400 z-20 pointer-events-none" style="left: ${hPercGeral}%;"></div>` : ''}<div class="px-6 py-4 w-full h-full relative"><div class="absolute top-1/2 -translate-y-1/2 rounded-sm shadow-sm overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%; height: 14px; background-color: #e2e8f0 !important; border: 1px solid #cbd5e1; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full" style="width: ${t.progresso}%; background-color: ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${t.progresso >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: calc(${tLeft + tWidth}% + 4px);"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded whitespace-nowrap">${t.progresso}%</span></div>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap no-print"><button onclick="window.editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="window.deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
+                    html += `<tr class="hover:bg-slate-50 transition-colors task-of-${safeFrenteId}"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="window.editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium whitespace-nowrap"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="window.updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 align-middle border-l border-r border-slate-200 h-full relative z-10"><div class="relative w-full h-full min-w-[500px] min-h-[40px] flex items-center"><div class="absolute top-1/2 -translate-y-1/2 rounded-[4px] overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%; height: 20px; background-color: #f1f5f9 !important; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full rounded-[4px]" style="width: ${t.progresso}%; background-color: ${hexT} !important; box-shadow: inset 0 0 0 1000px ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${t.progresso >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: ${tLeft + tWidth}%; margin-left: 8px;"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded whitespace-nowrap">${t.progresso}%</span></div>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap no-print"><button onclick="window.editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="window.deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
                 });
+                fIndex++;
             });
+
+            let tarefasSemFrente = p.tarefas.filter(t => !(p.frentes || []).includes(t.frente));
+            if(tarefasSemFrente.length > 0) {
+                const safeFrenteId = `frente-${fIndex}`;
+                html += `<tr class="frente-row" onclick="window.toggleFrente('${safeFrenteId}')"><td colspan="2" class="px-6 py-3 font-black text-slate-800 text-xs uppercase tracking-wider select-none"><span id="icon-${safeFrenteId}" class="inline-block transition-transform duration-200 mr-2 text-slate-400 no-print">▼</span> ${fIndex} - TAREFAS DIVERSAS</td><td colspan="5"></td></tr>`;
+                tarefasSemFrente.sort((a,b)=>new Date(a.inicio+"T12:00:00")-new Date(b.inicio+"T12:00:00")).forEach(t => {
+                    const resp = p.equipe?.find(u=>u.id==t.respId)?.nome||'Não Atribuído'; const st = statusDaTarefa(t.inicio, t.fim, t.progresso);
+                    let tLeft = (difDias(projIni, new Date(t.inicio+"T12:00:00")) / totalProjDias) * 100; let tWidth = Math.max((difDias(new Date(t.inicio+"T12:00:00"), new Date(t.fim+"T12:00:00")) / totalProjDias) * 100, 0.5);
+                    let hexT = '#94a3b8'; if(st === 'Concluída') hexT = '#10b981'; else if(st === 'Atrasada') hexT = '#ef4444'; else if(st === 'Em Andamento') hexT = '#3b82f6';
+                    html += `<tr class="hover:bg-slate-50 transition-colors task-of-${safeFrenteId}"><td class="px-6 py-3 pl-10 cursor-pointer" onclick="window.editarTarefa(${t.id})"><div class="font-bold text-slate-400 text-[10px] uppercase">${t.edt||'-'}</div><div class="font-semibold text-slate-700 text-xs">${t.nome}</div></td><td class="px-4 py-3 text-slate-600 text-[11px] font-medium leading-tight">${resp}</td><td class="px-4 py-3 text-slate-500 text-[10px] font-medium whitespace-nowrap"><span class="font-bold text-slate-700">${formatarData(t.inicio)}</span> - ${formatarData(t.fim)}</td><td class="px-2 py-3 text-center"><input type="number" min="0" max="100" value="${t.progresso}" onchange="window.updProg(${t.id}, this.value)" class="w-14 border rounded p-1 text-center text-[11px] font-bold text-blue-700 outline-none"></td><td class="px-4 py-3 text-center whitespace-nowrap"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${classColor(st,'text')} shadow-sm">${st}</span></td><td class="p-0 align-middle border-l border-r border-slate-200 h-full relative z-10"><div class="relative w-full h-full min-w-[500px] min-h-[40px] flex items-center"><div class="absolute top-1/2 -translate-y-1/2 rounded-[4px] overflow-hidden" style="left: ${tLeft}%; width: ${tWidth}%; height: 20px; background-color: #f1f5f9 !important; border: 1px solid #cbd5e1; box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"><div class="h-full rounded-[4px]" style="width: ${t.progresso}%; background-color: ${hexT} !important; box-shadow: inset 0 0 0 1000px ${hexT} !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div></div>${t.progresso >= 0 ? `<div class="absolute top-1/2 -translate-y-1/2 z-30" style="left: ${tLeft + tWidth}%; margin-left: 8px;"><span class="text-[10px] font-bold text-slate-700 bg-white/90 px-1 rounded whitespace-nowrap">${t.progresso}%</span></div>` : ''}</div></td><td class="px-4 py-3 text-right whitespace-nowrap no-print"><button onclick="window.editarTarefa(${t.id})" class="text-blue-500 hover:text-blue-700 text-lg transition-colors mr-2" title="Editar Tarefa">✏️</button><button onclick="window.deletarTarefa(${t.id})" class="text-slate-300 hover:text-rose-600 text-lg transition-colors" title="Excluir Tarefa">🗑️</button></td></tr>`;
+                });
+            }
+            
             tbody.innerHTML = html;
+
+            // Calcula a altura da linha inteligente para terminar na última linha preenchida
+            setTimeout(() => {
+                const tb = document.getElementById('cronograma-table-body'); const line = document.getElementById('red-line-projeto');
+                if(tb && line) { line.style.height = (tb.offsetHeight + 40) + 'px'; line.classList.remove('hidden'); }
+            }, 100);
         }
 
         window.updProg = function(taskId, val) { let num = parseInt(val); if(isNaN(num)||num<0) num=0; if(num>100) num=100; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const t = p.tarefas.find(x => x.id === taskId); if(t) { t.progresso = num; window.renderCronogramaFrentes(p); window.saveToCloud(); } }
@@ -902,7 +1011,7 @@
             const id = document.getElementById('np-id').value, nome = document.getElementById('np-nome').value, clienteId = document.getElementById('np-cliente').value, area = document.getElementById('np-area').value, ini = document.getElementById('np-inicio').value, fim = document.getElementById('np-fim').value;
             if(!nome||!ini||!fim||!clienteId) return;
             if(id) { const p = window.PROJETOS_DB.find(x => x.id === id); if(p) { p.nome=nome; p.clienteId=clienteId; p.area=area; p.inicio=ini; p.fim=fim; } } 
-            else { window.PROJETOS_DB.push({ id:"P"+Math.floor(Math.random()*100000), nome, clienteId, area, inicio:ini, fim, frentes: [], equipe: [], tarefas:[], relatorio:"" }); }
+            else { window.PROJETOS_DB.push({ id:"P"+Math.floor(Math.random()*100000), nome, clienteId, area, inicio:ini, fim, frentes: [], equipe: [], tarefas:[] }); }
             window.carregarListasBase(); window.fecharModal('modal-projeto'); window.navGlobal('portfolio'); window.saveToCloud();
         }
         window.deletarProjeto = (id) => { if(confirm("ATENÇÃO: Você está prestes a excluir este projeto.\nDeseja continuar?")) { if(confirm("DUPLA CONFIRMAÇÃO: Tem certeza? O projeto e todas suas tarefas serão apagados permanentemente.")) { window.PROJETOS_DB = window.PROJETOS_DB.filter(p => p.id !== id); window.carregarListasBase(); if(window.state.activeProjectId === id) window.navGlobal('portfolio'); else window.renderGlobal(); window.saveToCloud(); } } }
@@ -952,9 +1061,6 @@
         window.abrirEditarMembro = function(id) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const m = p.equipe.find(x => x.id === id); if(!m) return; document.getElementById('modal-editar-membro').classList.remove('hidden'); document.getElementById('em-id').value = m.id; document.getElementById('em-nome').value = m.nome; document.getElementById('em-papel').value = m.papel; }
         window.salvarEdicaoMembro = function() { const id = parseInt(document.getElementById('em-id').value); const nome = document.getElementById('em-nome').value.trim(); const papel = document.getElementById('em-papel').value.trim(); if(!nome || !papel) return; const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); const m = p.equipe.find(x => x.id === id); if(m) { m.nome = nome; m.papel = papel; } window.fecharModal('modal-editar-membro'); window.renderProject(); window.saveToCloud(); }
         window.removerMembro = function(mId) { const p = window.PROJETOS_DB.find(x => x.id === window.state.activeProjectId); if(p.tarefas.some(t => t.respId == mId)) { alert("Atribua as tarefas deste membro a outro responsável antes de removê-lo da equipe."); return; } if(confirm("Remover membro desta obra?")) { p.equipe = p.equipe.filter(m => m.id !== mId); window.renderProject(); window.saveToCloud(); } }
-        
-        window.salvarRelatorio = () => { window.PROJETOS_DB.find(x=>x.id===window.state.activeProjectId).relatorio = document.getElementById('relatorio-text').value; const btn = event.target; const txt = btn.innerHTML; btn.innerHTML = "✅ Salvo na Nuvem!"; btn.classList.replace('bg-slate-800', 'bg-emerald-600'); window.saveToCloud(); setTimeout(() => { btn.innerHTML = txt; btn.classList.replace('bg-emerald-600', 'bg-slate-800'); }, 2000); }
-
     </script>
 </body>
 </html>
